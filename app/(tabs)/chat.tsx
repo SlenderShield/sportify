@@ -226,14 +226,14 @@ const Sidebar = ({
                   const id = existing
                     ? existing.id
                     : useChatStore
-                        .getState()
-                        .createConversation({
-                          name: user.name,
-                          type: 'dm',
-                          memberIds: [currentUser.id, user.id],
-                          unreadCount: 0,
-                          avatar: '👤',
-                        });
+                      .getState()
+                      .createConversation({
+                        name: user.name,
+                        type: 'dm',
+                        memberIds: [currentUser.id, user.id],
+                        unreadCount: 0,
+                        avatar: '👤',
+                      });
                   setActiveConversation(id);
                   setShowDmModal(false);
                   setShowSidebar(false);
@@ -384,20 +384,20 @@ const ChatScreen = () => {
             renderBubble={props => {
               const giftedMsg = props.currentMessage;
               if (!giftedMsg) return null;
-              const chatMsg: ChatMessage = giftedMsg
-                ? {
-                    id: giftedMsg._id,
-                    userId: giftedMsg.user._id,
-                    username: giftedMsg.user.name,
-                    message: giftedMsg.text,
-                    timestamp: giftedMsg.createdAt,
-                  }
-                : undefined;
+
+              const chatMsg: ChatMessage = {
+                id: giftedMsg._id,
+                userId: giftedMsg.user._id,
+                username: giftedMsg.user.name,
+                message: giftedMsg.text,
+                timestamp: giftedMsg.createdAt,
+              };
+
               return (
                 <ChatBubble
                   {...props}
                   message={chatMsg}
-                  isCurrentUser={giftedMsg?.user?._id === currentUser.id}
+                  isCurrentUser={giftedMsg.user._id === currentUser.id}
                 />
               );
             }}
