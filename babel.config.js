@@ -10,7 +10,10 @@ module.exports = function (api) {
       ],
     ],
     plugins: [
-      ['react-native-worklets', { useBuildTimeDefine: true }],
+      ['@tamagui/babel-plugin', {
+        components: ['tamagui'],
+        config: './tamagui/config.ts',
+      }],
     ],
   };
 };

@@ -1,6 +1,5 @@
 import { createTamagui } from '@tamagui/core';
 import { tokens } from './tokens';
-import { themes } from './themes';
 // Ensure themes is a flat object: { light: { background: '', text: '', ... }, dark: { background: '', text: '', ... } }
 import { shorthands } from './shorthands';
 

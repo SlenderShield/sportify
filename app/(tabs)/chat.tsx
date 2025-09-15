@@ -384,15 +384,13 @@ const ChatScreen = () => {
             renderBubble={props => {
               const giftedMsg = props.currentMessage;
               if (!giftedMsg) return null;
-              const chatMsg: ChatMessage = giftedMsg
-                ? {
+              const chatMsg: ChatMessage = {
                     id: giftedMsg._id,
                     userId: giftedMsg.user._id,
                     username: giftedMsg.user.name,
                     message: giftedMsg.text,
-                    timestamp: giftedMsg.createdAt,
-                  }
-                : undefined;
+                    timestamp: giftedMsg.createdAt.toLocaleTimeString(),
+                  };
               return (
                 <ChatBubble
                   {...props}
