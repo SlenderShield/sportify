@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, YStack, XStack, Button } from 'tamagui';
+import { TouchableOpacity } from 'react-native';
 import type { CalendarEvent } from '@/types';
 import { Calendar, Clock, MapPin, Bell, BellOff, Trash2 } from 'lucide-react-native';
 
@@ -51,120 +52,52 @@ export const CalendarEventCard: React.FC<CalendarEventCardProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={[styles.typeBadge, { backgroundColor: getTypeColor() }]}>
-          <Text style={styles.typeText}>{getTypeLabel()}</Text>
-        </View>
-        <View style={styles.actions}>
+    <YStack backgroundColor="$background" borderRadius={12} padding={16} marginBottom={12} borderWidth={1} borderColor="$border">
+      <XStack justifyContent="space-between" alignItems="center" marginBottom={12}>
+        <YStack backgroundColor={getTypeColor()} borderRadius={12} paddingHorizontal={8} paddingVertical={4}>
+          <Text color="$background" fontSize={10} fontWeight="600" textTransform="uppercase">{getTypeLabel()}</Text>
+        </YStack>
+        <XStack flexDirection="row" gap={8}>
           {onToggleReminder && (
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => onToggleReminder(event.id)}
-            >
+            <Button chromeless onPress={() => onToggleReminder(event.id)}>
               {event.reminder ? (
-                <Bell size={18} color="#3B82F6" />
+                <Bell size={18} color="$primary" />
               ) : (
-                <BellOff size={18} color="#6B7280" />
+                <BellOff size={18} color="$secondary" />
               )}
-            </TouchableOpacity>
+            </Button>
           )}
           {onDelete && (
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => onDelete(event.id)}
-            >
-              <Trash2 size={18} color="#EF4444" />
-            </TouchableOpacity>
+            <Button chromeless onPress={() => onDelete(event.id)}>
+              <Trash2 size={18} color="$danger" />
+            </Button>
           )}
-        </View>
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.title}>{event.title}</Text>
+        </XStack>
+      </XStack>
+      <YStack gap={8}>
+        <Text fontSize={16} fontWeight="600" color="$text">{event.title}</Text>
         {event.description && (
-          <Text style={styles.description} numberOfLines={2}>
-            {event.description}
-          </Text>
+          <Text fontSize={14} color="$secondary" lineHeight={18} numberOfLines={2}>{event.description}</Text>
         )}
-
-        <View style={styles.details}>
-          <View style={styles.detailItem}>
-            <Calendar size={14} color="#6B7280" />
-            <Text style={styles.detailText}>{formatDate(event.date)}</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Clock size={14} color="#6B7280" />
-            <Text style={styles.detailText}>{formatTime(event.time)}</Text>
-          </View>
+        <YStack gap={6}>
+          <XStack alignItems="center" gap={6}>
+            <Calendar size={14} color="$secondary" />
+            <Text fontSize={12} color="$secondary">{formatDate(event.date)}</Text>
+          </XStack>
+          <XStack alignItems="center" gap={6}>
+            <Clock size={14} color="$secondary" />
+            <Text fontSize={12} color="$secondary">{formatTime(event.time)}</Text>
+          </XStack>
           {event.location && (
-            <View style={styles.detailItem}>
-              <MapPin size={14} color="#6B7280" />
-              <Text style={styles.detailText}>{event.location}</Text>
-            </View>
+            <XStack alignItems="center" gap={6}>
+              <MapPin size={14} color="$secondary" />
+              <Text fontSize={12} color="$secondary">{event.location}</Text>
+            </XStack>
           )}
-        </View>
-      </View>
-    </View>
+        </YStack>
+      </YStack>
+    </YStack>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  typeBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  typeText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    padding: 4,
-  },
-  content: {
-    gap: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  description: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 18,
-  },
-  details: {
-    gap: 6,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  detailText: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
-});
+// Styles removed: now using Tamagui tokens and primitives for layout and spacing

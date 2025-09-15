@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, YStack, XStack, Button, Theme } from 'tamagui';
+import { TouchableOpacity } from 'react-native';
 import type { Match } from '@/types';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react-native';
 
@@ -44,148 +45,49 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, onPress }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
-      <View style={styles.header}>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor() }]}>
-          <Text style={styles.statusText}>{getStatusText()}</Text>
-        </View>
-        <View style={styles.dateContainer}>
-          <Calendar size={14} color="#6B7280" />
-          <Text style={styles.dateText}>{formatDate(match.date)}</Text>
-        </View>
-      </View>
-
-      <View style={styles.matchInfo}>
-        <View style={styles.teamsContainer}>
-          <View style={styles.team}>
-            <Text style={styles.teamName}>{match.homeTeam}</Text>
-            <Text style={styles.teamLabel}>HOME</Text>
-          </View>
-          
-          <View style={styles.versus}>
-            {match.score ? (
-              <View style={styles.scoreContainer}>
-                <Text style={styles.score}>
-                  {match.score.home} - {match.score.away}
-                </Text>
-              </View>
-            ) : (
-              <Text style={styles.vsText}>VS</Text>
-            )}
-          </View>
-          
-          <View style={styles.team}>
-            <Text style={styles.teamName}>{match.awayTeam}</Text>
-            <Text style={styles.teamLabel}>AWAY</Text>
-          </View>
-        </View>
-
-        <View style={styles.details}>
-          <View style={styles.detailItem}>
-            <Clock size={16} color="#6B7280" />
-            <Text style={styles.detailText}>{match.time}</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <MapPin size={16} color="#6B7280" />
-            <Text style={styles.detailText}>{match.venue}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+    <Button chromeless onPress={onPress} width="100%" padding={0}>
+      <YStack backgroundColor="$background" borderRadius="$lg" padding="$md" marginBottom="$md" borderWidth={1} borderColor="$border">
+        <XStack justifyContent="space-between" alignItems="center" marginBottom="$md">
+          <YStack backgroundColor={getStatusColor()} borderRadius={12} paddingHorizontal={8} paddingVertical={4}>
+            <Text color="$background" fontSize={10} fontWeight="600">{getStatusText()}</Text>
+          </YStack>
+          <XStack alignItems="center">
+            <Calendar size={14} color="$secondary" />
+            <Text fontSize={12} color="$secondary" marginLeft={4}>{formatDate(match.date)}</Text>
+          </XStack>
+        </XStack>
+        <YStack alignItems="center">
+          <XStack justifyContent="space-between" alignItems="center" width="100%" marginBottom="$md">
+            <YStack alignItems="center" flex={1}>
+              <Text fontSize={16} fontWeight="600" color="$text" textAlign="center" marginBottom={4}>{match.homeTeam}</Text>
+              <Text fontSize={10} color="$secondary" fontWeight="500">HOME</Text>
+            </YStack>
+            <YStack marginInline={16} alignItems="center">
+              {match.score ? (
+                <YStack background="$background" paddingHorizontal={12} paddingVertical={6} borderRadius={8}>
+                  <Text fontSize={18} fontWeight="bold" color="$text">{match.score.home} - {match.score.away}</Text>
+                </YStack>
+              ) : (
+                <Text fontSize={14} fontWeight="600" color="$secondary">VS</Text>
+              )}
+            </YStack>
+            <YStack alignItems="center" flex={1}>
+              <Text fontSize={16} fontWeight="600" color="$text" textAlign="center" marginBottom={4}>{match.awayTeam}</Text>
+              <Text fontSize={10} color="$secondary" fontWeight="500">AWAY</Text>
+            </YStack>
+          </XStack>
+          <XStack justifyContent="center" gap={20}>
+            <XStack alignItems="center">
+              <Clock size={16} color="$secondary" />
+              <Text fontSize={12} color="$secondary" marginLeft={4}>{match.time}</Text>
+            </XStack>
+            <XStack alignItems="center">
+              <MapPin size={16} color="$secondary" />
+              <Text fontSize={12} color="$secondary" marginLeft={4}>{match.venue}</Text>
+            </XStack>
+          </XStack>
+        </YStack>
+      </YStack>
+    </Button>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginLeft: 4,
-  },
-  matchInfo: {
-    alignItems: 'center',
-  },
-  teamsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: 16,
-  },
-  team: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  teamName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  teamLabel: {
-    fontSize: 10,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  versus: {
-    marginHorizontal: 16,
-    alignItems: 'center',
-  },
-  vsText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  scoreContainer: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  score: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  details: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailText: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginLeft: 4,
-  },
-});

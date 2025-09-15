@@ -10,8 +10,7 @@ module.exports = function (api) {
       ],
     ],
     plugins: [
-      // Remove reanimated plugin temporarily or configure it properly
-      // ['react-native-reanimated/plugin'],
+      ['react-native-worklets', { useBuildTimeDefine: true }],
     ],
   };
 };

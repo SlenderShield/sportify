@@ -1,4 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, YStack, XStack, Button, Theme, useMedia } from 'tamagui';
+import { RefreshControl } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
@@ -53,155 +55,68 @@ export default function DashboardScreen() {
 
   const upcomingEvents = getUpcomingEvents(7);
 
+  const media = useMedia();
   return (
-    <ScrollView 
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, {user?.name}!</Text>
-        <Text style={styles.subtitle}>Ready for your next match?</Text>
-      </View>
-
-      {/* Quick Actions */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.quickActions}>
-          <QuickActionButton
-            icon={MessageCircle}
-            title="Chat"
-            onPress={() => router.push('/chat')}
-            color="#10B981"
-          />
-          <QuickActionButton
-            icon={Calendar}
-            title="Calendar"
-            onPress={() => router.push('/calendar')}
-            color="#3B82F6"
-          />
-          <QuickActionButton
-            icon={Map}
-            title="Maps"
-            onPress={() => router.push('/maps')}
-            color="#F59E0B"
-          />
-          <QuickActionButton
-            icon={Bell}
-            title="Notifications"
-            onPress={() => router.push('/notifications')}
-            color="#EF4444"
-            badge={unreadCount > 0 ? unreadCount : undefined}
-          />
-        </View>
-      </View>
-
-      {/* Upcoming Matches */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Upcoming Matches</Text>
-          <TouchableOpacity style={styles.seeAllButton}>
-            <Text style={styles.seeAllText}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        {upcomingMatches.length > 0 ? (
-          upcomingMatches.slice(0, 3).map(match => (
-            <MatchCard key={match.id} match={match} />
-          ))
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No upcoming matches</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Today's Events */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>This Week</Text>
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => router.push('/calendar')}
-          >
-            <Plus size={20} color="#3B82F6" />
-          </TouchableOpacity>
-        </View>
-        {upcomingEvents.length > 0 ? (
-          upcomingEvents.slice(0, 3).map(event => (
-            <CalendarEventCard key={event.id} event={event} />
-          ))
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No events this week</Text>
-          </View>
-        )}
-      </View>
-    </ScrollView>
+    <Theme name={media.md ? 'light' : 'dark'}>
+      <ScrollView
+        backgroundColor="$background"
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        <YStack space="$md">
+          <YStack backgroundColor="$primary" padding="$lg" paddingTop={60}>
+            <Text fontSize={28} fontWeight="bold" color="$background">Hello, {user?.name}!</Text>
+            <Text fontSize={16} color="$secondary">Ready for your next match?</Text>
+          </YStack>
+          {/* Quick Actions */}
+          <YStack padding="$lg">
+            <Text fontSize={20} fontWeight="600" color="$text">Quick Actions</Text>
+            <XStack space="$md" flexWrap="wrap" justifyContent="space-between">
+              <QuickActionButton icon={MessageCircle} title="Chat" onPress={() => router.push('/chat')} color="#10B981" />
+              <QuickActionButton icon={Calendar} title="Calendar" onPress={() => router.push('/calendar')} color="#3B82F6" />
+              <QuickActionButton icon={Map} title="Maps" onPress={() => router.push('/maps')} color="#F59E0B" />
+              <QuickActionButton icon={Bell} title="Notifications" onPress={() => router.push('/notifications')} color="#EF4444" badge={unreadCount > 0 ? unreadCount : undefined} />
+            </XStack>
+          </YStack>
+          {/* Upcoming Matches */}
+          <YStack padding="$lg">
+            <XStack alignItems="center" justifyContent="space-between" marginBottom="$md">
+              <Text fontSize={20} fontWeight="600" color="$text">Upcoming Matches</Text>
+              <Button chromeless>
+                <Text color="$primary">See All</Text>
+              </Button>
+            </XStack>
+            {upcomingMatches.length > 0 ? (
+              upcomingMatches.slice(0, 3).map(match => (
+                <MatchCard key={match.id} match={match} />
+              ))
+            ) : (
+              <YStack padding="$lg" alignItems="center" borderRadius="$lg" borderWidth={1} borderColor="$border" backgroundColor="$background">
+                <Text color="$secondary" fontSize={16}>No upcoming matches</Text>
+              </YStack>
+            )}
+          </YStack>
+          {/* This Week's Events */}
+          <YStack padding="$lg">
+            <XStack alignItems="center" justifyContent="space-between" marginBottom="$md">
+              <Text fontSize={20} fontWeight="600" color="$text">This Week</Text>
+              <Button chromeless onPress={() => router.push('/calendar')}>
+                <Plus size={20} color="#3B82F6" />
+              </Button>
+            </XStack>
+            {upcomingEvents.length > 0 ? (
+              upcomingEvents.slice(0, 3).map(event => (
+                <CalendarEventCard key={event.id} event={event} />
+              ))
+            ) : (
+              <YStack padding="$lg" alignItems="center" borderRadius="$lg" borderWidth={1} borderColor="$border" backgroundColor="$background">
+                <Text color="$secondary" fontSize={16}>No events this week</Text>
+              </YStack>
+            )}
+          </YStack>
+        </YStack>
+      </ScrollView>
+    </Theme>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  header: {
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: '#3B82F6',
-  },
-  greeting: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#E0E7FF',
-  },
-  section: {
-    padding: 20,
-    marginBottom: 8,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  seeAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  seeAllText: {
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-  addButton: {
-    padding: 6,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-  },
-  emptyState: {
-    padding: 20,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  emptyText: {
-    color: '#6B7280',
-    fontSize: 16,
-  },
-});
+// Styles removed: now using Tamagui tokens and primitives for layout and spacing

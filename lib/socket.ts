@@ -10,9 +10,9 @@ class MockSocket {
     { id: 'bot2', name: 'Coach AI', isOnline: true },
     { id: 'bot3', name: 'Stats Bot', isOnline: false },
   ];
-  private messageInterval: NodeJS.Timeout | null = null;
-  private typingInterval: NodeJS.Timeout | null = null;
-  private presenceInterval: NodeJS.Timeout | null = null;
+  private messageInterval: ReturnType<typeof setInterval> | null = null;
+  private typingInterval: ReturnType<typeof setInterval> | null = null;
+  private presenceInterval: ReturnType<typeof setInterval> | null = null;
 
   connect() {
     this.connected = true;

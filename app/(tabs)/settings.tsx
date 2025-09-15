@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { YStack, XStack, Text, Button, ScrollView } from 'tamagui';
+import { Switch, Alert } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { router } from 'expo-router';
@@ -38,38 +38,35 @@ export default function SettingsScreen() {
     onPress?: () => void,
     rightElement?: React.ReactNode
   ) => (
-    <TouchableOpacity
-      style={styles.settingItem}
-      onPress={onPress}
-      disabled={!onPress && !rightElement}
-    >
-      <View style={styles.settingLeft}>
-        {icon}
-        <View style={styles.settingText}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-        </View>
-      </View>
-      {rightElement || (onPress && <ChevronRight size={20} color="#6B7280" />)}
-    </TouchableOpacity>
+    <Button chromeless onPress={onPress} disabled={!onPress && !rightElement} width="100%" padding={0}>
+      <XStack alignItems="center" justifyContent="space-between" paddingHorizontal="$4" paddingVertical="$4" borderBottomWidth={1} borderBottomColor="$border">
+        <XStack alignItems="center" flex={1}>
+          {icon}
+          <YStack marginLeft="$3" flex={1}>
+            <Text fontSize="$5" fontWeight="500" color="$gray12">{title}</Text>
+            {subtitle && <Text fontSize="$4" color="$gray10" marginTop={2}>{subtitle}</Text>}
+          </YStack>
+        </XStack>
+        {rightElement || (onPress && <ChevronRight size={20} color="#6B7280" />)}
+      </XStack>
+    </Button>
   );
 
   const renderSection = (title: string, children: React.ReactNode) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.sectionContent}>
+    <YStack backgroundColor="$background" marginBottom="$2">
+      <Text fontSize="$4" fontWeight="600" color="$gray10" paddingHorizontal="$4" paddingTop="$4" paddingBottom="$2" textTransform="uppercase">{title}</Text>
+      <YStack paddingBottom="$2">
         {children}
-      </View>
-    </View>
+      </YStack>
+    </YStack>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Settings</Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <YStack flex={1} backgroundColor="$background">
+      <YStack paddingHorizontal="$4" paddingVertical="$4" backgroundColor="$white" borderBottomWidth={1} borderBottomColor="$border">
+        <Text fontSize="$7" fontWeight="600" color="$gray12">Settings</Text>
+      </YStack>
+      <ScrollView flex={1} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         {renderSection('Profile', (
           <>
@@ -195,99 +192,13 @@ export default function SettingsScreen() {
         ))}
 
         {/* Logout Section */}
-        <View style={styles.logoutSection}>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
+        <YStack backgroundColor="$white" marginTop="$4" paddingVertical="$2">
+          <Button chromeless onPress={handleLogout} flexDirection="row" alignItems="center" paddingHorizontal="$4" paddingVertical="$4">
             <LogOut size={24} color="#EF4444" />
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+            <Text fontSize="$5" fontWeight="500" color="$red10" marginLeft="$3">Logout</Text>
+          </Button>
+        </YStack>
       </ScrollView>
-    </SafeAreaView>
+    </YStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  content: {
-    flex: 1,
-  },
-  section: {
-    backgroundColor: '#FFFFFF',
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-    textTransform: 'uppercase',
-  },
-  sectionContent: {
-    paddingBottom: 8,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  settingText: {
-    marginLeft: 16,
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-  },
-  settingSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  logoutSection: {
-    backgroundColor: '#FFFFFF',
-    marginTop: 20,
-    paddingVertical: 8,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  logoutText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#EF4444',
-    marginLeft: 16,
-  },
-});

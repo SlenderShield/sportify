@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { YStack, XStack, Text, Button } from 'tamagui';
+import { TouchableOpacity } from 'react-native';
 import type { NotificationItem as NotificationItemType } from '@/types';
 import { Bell, MessageCircle, Calendar, Info, Trash2 } from 'lucide-react-native';
 
@@ -8,10 +9,8 @@ interface NotificationItemProps {
   onDelete: () => void;
 }
 
-export const NotificationItem: React.FC<NotificationItemProps> = ({
-  notification,
-  onPress,
-  onDelete
+export const NotificationItem: React.FC<NotificationItemProps> = ({ 
+  notification, onPress, onDelete 
 }) => {
   const getIcon = () => {
     switch (notification.type) {
@@ -30,11 +29,9 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     const date = new Date(timestamp);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
-    
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-
     if (days > 0) {
       return `${days}d ago`;
     } else if (hours > 0) {
@@ -47,109 +44,39 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.container,
-        !notification.read && styles.unreadContainer
-      ]}
-      onPress={onPress}
-    >
-      <View style={styles.iconContainer}>
-        {getIcon()}
-      </View>
-      
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={[
-            styles.title,
-            !notification.read && styles.unreadTitle
-          ]}>
-            {notification.title}
-          </Text>
-          <Text style={styles.timestamp}>
-            {formatTime(notification.timestamp)}
-          </Text>
-        </View>
-        
-        <Text style={styles.message} numberOfLines={2}>
-          {notification.message}
-        </Text>
-        
-        {!notification.read && <View style={styles.unreadDot} />}
-      </View>
-
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={onDelete}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    <TouchableOpacity onPress={onPress}>
+      <XStack
+        alignItems="flex-start"
+        padding={16}
+        backgroundColor={notification.read ? '$background' : '$red1'}
+        borderBottomWidth={1}
+        borderBottomColor="$gray5"
+        width="100%"
       >
-        <Trash2 size={16} color="#EF4444" />
-      </TouchableOpacity>
+        <YStack width={40} height={40} borderRadius={20} backgroundColor="$gray2" alignItems="center" justifyContent="center" marginRight={12}>
+          {getIcon()}
+        </YStack>
+        <YStack flex={1} position="relative">
+          <XStack justifyContent="space-between" alignItems="flex-start" marginBottom={4}>
+            <Text fontSize={16} fontWeight={notification.read ? "500" : "600"} color="$gray12" flex={1} marginRight={8}>
+              {notification.title}
+            </Text>
+            <Text fontSize={12} color="$gray8">{formatTime(notification.timestamp)}</Text>
+          </XStack>
+          <Text fontSize={14} color="$gray8" lineHeight={18} numberOfLines={2}>{notification.message}</Text>
+          {!notification.read && (
+            <YStack position="absolute" top={0} right={-8} width={8} height={8} borderRadius={4} backgroundColor="$blue10" />
+          )}
+        </YStack>
+        <Button
+          chromeless
+          onPress={onDelete}
+          padding={4}
+          marginLeft={8}
+          icon={<Trash2 size={16} color="#EF4444" />}
+          aria-label="Delete notification"
+        />
+      </XStack>
     </TouchableOpacity>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  unreadContainer: {
-    backgroundColor: '#FEF3F2',
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F9FAFB',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  content: {
-    flex: 1,
-    position: 'relative',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-    flex: 1,
-    marginRight: 8,
-  },
-  unreadTitle: {
-    fontWeight: '600',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
-  message: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 18,
-  },
-  unreadDot: {
-    position: 'absolute',
-    top: 0,
-    right: -8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#3B82F6',
-  },
-  deleteButton: {
-    padding: 4,
-    marginLeft: 8,
-  },
-});
+}

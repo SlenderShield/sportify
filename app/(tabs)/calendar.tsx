@@ -1,34 +1,35 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import {
+  YStack,
+  XStack,
+  Text,
+  Button,
+  Input,
+  ScrollView,
+} from 'tamagui';
+import { Dialog } from '@tamagui/dialog';
 import { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert } from 'react-native';
 import { useCalendar } from '@/hooks/useCalendar';
 import { CalendarEventCard } from '@/components/CalendarEventCard';
-import { Plus, Calendar as CalendarIcon, Clock, MapPin, X } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import type { CalendarEvent } from '@/types';
 
+const defaultEvent = (): Partial<CalendarEvent> => ({
+  title: '',
+  description: '',
+  date: new Date().toISOString().split('T')[0],
+  time: '12:00',
+  type: 'other',
+  reminder: true,
+  location: '',
+});
+
 export default function CalendarScreen() {
-  const { 
-    events, 
-    selectedDate, 
-    addEvent, 
-    removeEvent, 
-    setSelectedDate, 
-    getEventsForDate,
-    getTodayEvents,
-    getUpcomingEvents,
-    toggleReminder
-  } = useCalendar();
+  const { addEvent, removeEvent, getTodayEvents, getUpcomingEvents, toggleReminder } =
+    useCalendar();
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newEvent, setNewEvent] = useState<Partial<CalendarEvent>>({
-    title: '',
-    description: '',
-    date: new Date().toISOString().split('T')[0],
-    time: '12:00',
-    type: 'other',
-    reminder: true,
-    location: ''
-  });
+  const [newEvent, setNewEvent] = useState<Partial<CalendarEvent>>(defaultEvent());
 
   const todayEvents = getTodayEvents();
   const upcomingEvents = getUpcomingEvents(14);
@@ -45,161 +46,31 @@ export default function CalendarScreen() {
       date: newEvent.date || new Date().toISOString().split('T')[0],
       time: newEvent.time || '12:00',
       type: newEvent.type || 'other',
-      reminder: newEvent.reminder || false,
-      location: newEvent.location || ''
+      reminder: newEvent.reminder ?? false,
+      location: newEvent.location || '',
     });
 
-    // Reset form
-    setNewEvent({
-      title: '',
-      description: '',
-      date: new Date().toISOString().split('T')[0],
-      time: '12:00',
-      type: 'other',
-      reminder: true,
-      location: ''
-    });
-
+    setNewEvent(defaultEvent());
     setShowAddModal(false);
   };
 
   const handleDeleteEvent = (eventId: string) => {
-    Alert.alert(
-      'Delete Event',
-      'Are you sure you want to delete this event?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => removeEvent(eventId),
-        },
-      ]
-    );
+    Alert.alert('Delete Event', 'Are you sure you want to delete this event?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => removeEvent(eventId) },
+    ]);
   };
 
-  const renderAddEventModal = () => (
-    <Modal
-      visible={showAddModal}
-      animationType="slide"
-      presentationStyle="formSheet"
-    >
-      <SafeAreaView style={styles.modalContainer}>
-        <View style={styles.modalHeader}>
-          <TouchableOpacity
-            onPress={() => setShowAddModal(false)}
-            style={styles.modalCloseButton}
-          >
-            <X size={24} color="#6B7280" />
-          </TouchableOpacity>
-          <Text style={styles.modalTitle}>Add Event</Text>
-          <TouchableOpacity
-            onPress={handleAddEvent}
-            style={styles.modalSaveButton}
-          >
-            <Text style={styles.modalSaveText}>Save</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView style={styles.modalContent}>
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Title *</Text>
-            <TextInput
-              style={styles.formInput}
-              value={newEvent.title}
-              onChangeText={(text) => setNewEvent({ ...newEvent, title: text })}
-              placeholder="Enter event title"
-              autoFocus
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Description</Text>
-            <TextInput
-              style={[styles.formInput, styles.textArea]}
-              value={newEvent.description}
-              onChangeText={(text) => setNewEvent({ ...newEvent, description: text })}
-              placeholder="Enter event description"
-              multiline
-              numberOfLines={3}
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Location</Text>
-            <TextInput
-              style={styles.formInput}
-              value={newEvent.location}
-              onChangeText={(text) => setNewEvent({ ...newEvent, location: text })}
-              placeholder="Enter location"
-            />
-          </View>
-
-          <View style={styles.formRow}>
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Date</Text>
-              <TextInput
-                style={styles.formInput}
-                value={newEvent.date}
-                onChangeText={(text) => setNewEvent({ ...newEvent, date: text })}
-                placeholder="YYYY-MM-DD"
-              />
-            </View>
-
-            <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Time</Text>
-              <TextInput
-                style={styles.formInput}
-                value={newEvent.time}
-                onChangeText={(text) => setNewEvent({ ...newEvent, time: text })}
-                placeholder="HH:MM"
-              />
-            </View>
-          </View>
-
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Type</Text>
-            <View style={styles.typeButtons}>
-              {['match', 'training', 'meeting', 'other'].map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  style={[
-                    styles.typeButton,
-                    newEvent.type === type && styles.typeButtonActive
-                  ]}
-                  onPress={() => setNewEvent({ ...newEvent, type: type as any })}
-                >
-                  <Text style={[
-                    styles.typeButtonText,
-                    newEvent.type === type && styles.typeButtonTextActive
-                  ]}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={styles.reminderToggle}
-            onPress={() => setNewEvent({ ...newEvent, reminder: !newEvent.reminder })}
-          >
-            <View style={[
-              styles.reminderCheckbox,
-              newEvent.reminder && styles.reminderCheckboxActive
-            ]}>
-              {newEvent.reminder && <Text style={styles.reminderCheckmark}>✓</Text>}
-            </View>
-            <Text style={styles.reminderText}>Set reminder</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
-    </Modal>
-  );
-
   const renderSection = (title: string, items: CalendarEvent[], emptyText: string) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+    <YStack
+      padding={20}
+      backgroundColor="$background"
+      marginBottom={8}
+      borderRadius={12}
+    >
+      <Text fontSize={18} fontWeight="600" color="$gray12" marginBottom={16}>
+        {title}
+      </Text>
       {items.length > 0 ? (
         items.map(event => (
           <CalendarEventCard
@@ -210,197 +81,260 @@ export default function CalendarScreen() {
           />
         ))
       ) : (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>{emptyText}</Text>
-        </View>
+        <YStack
+          padding={20}
+          alignItems="center"
+          backgroundColor="$background"
+          borderRadius={12}
+          borderWidth={1}
+          borderColor="$gray5"
+        >
+          <Text color="$gray8" fontSize={16}>
+            {emptyText}
+          </Text>
+        </YStack>
       )}
-    </View>
+    </YStack>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Calendar</Text>
-        <TouchableOpacity
-          style={styles.addButton}
+    <YStack flex={1} backgroundColor="$background">
+      {/* Header */}
+      <XStack
+        justifyContent="space-between"
+        alignItems="center"
+        paddingHorizontal={20}
+        paddingVertical={16}
+        borderBottomWidth={1}
+        borderBottomColor="$gray5"
+      >
+        <Text fontSize={24} fontWeight="600" color="$gray12">
+          Calendar
+        </Text>
+        <Button
+          size="$4"
+          backgroundColor="$blue10"
+          borderRadius={20}
+          padding={10}
+          icon={<Plus size={20} color="#FFFFFF" />}
           onPress={() => setShowAddModal(true)}
-        >
-          <Plus size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+          aria-label="Add Event"
+        />
+      </XStack>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      {/* Body */}
+      <ScrollView flex={1} showsVerticalScrollIndicator={false}>
         {renderSection('Today', todayEvents, 'No events today')}
         {renderSection('Upcoming', upcomingEvents, 'No upcoming events')}
       </ScrollView>
 
-      {renderAddEventModal()}
-    </SafeAreaView>
+      {/* Tamagui Dialog for Add Event */}
+      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            key="overlay"
+            backgroundColor="rgba(0,0,0,0.5)"
+            opacity={0.5}
+            animation="fast"
+          />
+          <Dialog.Content
+            key="content"
+            bordered
+            elevate
+            width="90%"
+            maxWidth={500}
+            backgroundColor="$background"
+            borderRadius="$4"
+            padding={20}
+          >
+            <Dialog.Title>
+              <Text fontSize={20} fontWeight="600" color="$gray12">
+                Add Event
+              </Text>
+            </Dialog.Title>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingVertical: 20 }}
+            >
+              {/* Title */}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="500" color="$gray12" marginBottom={8}>
+                  Title *
+                </Text>
+                <Input
+                  value={newEvent.title}
+                  onChangeText={text => setNewEvent({ ...newEvent, title: text })}
+                  placeholder="Enter event title"
+                  borderWidth={1}
+                  borderColor="$gray5"
+                  borderRadius={8}
+                  paddingHorizontal={12}
+                  paddingVertical={12}
+                  fontSize={16}
+                  backgroundColor="$background"
+                  autoFocus
+                />
+              </YStack>
+
+              {/* Description */}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="500" color="$gray12" marginBottom={8}>
+                  Description
+                </Text>
+                <Input
+                  value={newEvent.description}
+                  onChangeText={text => setNewEvent({ ...newEvent, description: text })}
+                  placeholder="Enter event description"
+                  multiline
+                  numberOfLines={3}
+                  borderWidth={1}
+                  borderColor="$gray5"
+                  borderRadius={8}
+                  paddingHorizontal={12}
+                  paddingVertical={12}
+                  fontSize={16}
+                  backgroundColor="$background"
+                  height={80}
+                />
+              </YStack>
+
+              {/* Location */}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="500" color="$gray12" marginBottom={8}>
+                  Location
+                </Text>
+                <Input
+                  value={newEvent.location}
+                  onChangeText={text => setNewEvent({ ...newEvent, location: text })}
+                  placeholder="Enter location"
+                  borderWidth={1}
+                  borderColor="$gray5"
+                  borderRadius={8}
+                  paddingHorizontal={12}
+                  paddingVertical={12}
+                  fontSize={16}
+                  backgroundColor="$background"
+                />
+              </YStack>
+
+              {/* Date & Time */}
+              <XStack gap={12}>
+                <YStack flex={1}>
+                  <Text fontSize={16} fontWeight="500" color="$gray12" marginBottom={8}>
+                    Date
+                  </Text>
+                  <Input
+                    value={newEvent.date}
+                    onChangeText={text => setNewEvent({ ...newEvent, date: text })}
+                    placeholder="YYYY-MM-DD"
+                    borderWidth={1}
+                    borderColor="$gray5"
+                    borderRadius={8}
+                    paddingHorizontal={12}
+                    paddingVertical={12}
+                    fontSize={16}
+                    backgroundColor="$background"
+                  />
+                </YStack>
+                <YStack flex={1}>
+                  <Text fontSize={16} fontWeight="500" color="$gray12" marginBottom={8}>
+                    Time
+                  </Text>
+                  <Input
+                    value={newEvent.time}
+                    onChangeText={text => setNewEvent({ ...newEvent, time: text })}
+                    placeholder="HH:MM"
+                    borderWidth={1}
+                    borderColor="$gray5"
+                    borderRadius={8}
+                    paddingHorizontal={12}
+                    paddingVertical={12}
+                    fontSize={16}
+                    backgroundColor="$background"
+                  />
+                </YStack>
+              </XStack>
+
+              {/* Type Selector */}
+              {/* Type Selector */}
+              <YStack marginVertical={20}>
+                <Text fontSize={16} fontWeight="500" color="$gray12" marginBottom={8}>
+                  Type
+                </Text>
+                <XStack gap={8} flexWrap="wrap">
+                  {['match', 'training', 'meeting', 'other'].map(type => (
+                    <Button
+                      key={type}
+                      backgroundColor={newEvent.type === type ? '$blue10' : '$background'}
+                      borderColor={newEvent.type === type ? '$blue10' : '$gray5'}
+                      borderWidth={1}
+                      borderRadius={20}
+                      paddingHorizontal={16}
+                      paddingVertical={8}
+                      onPress={() =>
+                        setNewEvent({ ...newEvent, type: type as CalendarEvent['type'] })
+                      }
+                    >
+                      <Text
+                        fontSize={14}
+                        color={newEvent.type === type ? '$white' : '$gray8'}
+                      >
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </Text>
+                    </Button>
+                  ))}
+                </XStack>
+              </YStack>
+
+
+              {/* Reminder Toggle */}
+              <XStack alignItems="center" paddingVertical={12}>
+                <YStack
+                  width={20}
+                  height={20}
+                  borderWidth={2}
+                  borderColor={newEvent.reminder ? '$blue10' : '$gray5'}
+                  borderRadius={4}
+                  marginRight={12}
+                  alignItems="center"
+                  justifyContent="center"
+                  backgroundColor={newEvent.reminder ? '$blue10' : '$background'}
+                  onPress={() =>
+                    setNewEvent({ ...newEvent, reminder: !newEvent.reminder })
+                  }
+                >
+                  {newEvent.reminder && (
+                    <Text color="$white" fontSize={12} fontWeight="bold">
+                      ✓
+                    </Text>
+                  )}
+                </YStack>
+                <Text fontSize={16} color="$gray12">
+                  Set reminder
+                </Text>
+              </XStack>
+            </ScrollView>
+
+            <XStack justifyContent="flex-end" marginTop={16} gap={12}>
+              <Dialog.Close asChild>
+                <Button
+                  variant="outlined"
+                  borderColor="$gray6"
+                  onPress={() => setShowAddModal(false)}
+                >
+                  Cancel
+                </Button>
+              </Dialog.Close>
+              <Button backgroundColor="$blue10" onPress={handleAddEvent}>
+                <Text color="$white" fontWeight="500">
+                  Save
+                </Text>
+              </Button>
+            </XStack>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog>
+    </YStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  addButton: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 20,
-    padding: 10,
-  },
-  content: {
-    flex: 1,
-  },
-  section: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 16,
-  },
-  emptyState: {
-    padding: 20,
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  emptyText: {
-    color: '#6B7280',
-    fontSize: 16,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  modalSaveButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#3B82F6',
-    borderRadius: 8,
-  },
-  modalSaveText: {
-    color: '#FFFFFF',
-    fontWeight: '500',
-  },
-  modalContent: {
-    flex: 1,
-    padding: 20,
-  },
-  formGroup: {
-    marginBottom: 20,
-  },
-  formLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  formInput: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  formRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  typeButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  typeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#FFFFFF',
-  },
-  typeButtonActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
-  },
-  typeButtonText: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  typeButtonTextActive: {
-    color: '#FFFFFF',
-  },
-  reminderToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  reminderCheckbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    borderRadius: 4,
-    marginRight: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  reminderCheckboxActive: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
-  },
-  reminderCheckmark: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  reminderText: {
-    fontSize: 16,
-    color: '#111827',
-  },
-});

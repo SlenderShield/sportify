@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { YStack, Text, Spinner } from 'tamagui';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useAuth } from '@/hooks/useAuth';
+import { TamaguiProvider } from 'tamagui';
+import { tamaguiConfig } from '../tamagui/config';
 
 function AuthGate() {
   const [isInitialized, setIsInitialized] = useState(false);
-  const { 
-    isAuthenticated, 
-    hasCompletedOnboarding, 
-    isLoading, 
+  const {
+    isAuthenticated,
+    hasCompletedOnboarding,
+    isLoading,
     user,
-    restoreSession 
+    restoreSession
   } = useAuth();
   const frameworkReady = useFrameworkReady();
 
   useEffect(() => {
     if (!frameworkReady) return;
-    
+
     // Initialize session restoration
     const initializeAuth = async () => {
       try {
@@ -55,34 +57,19 @@ function AuthGate() {
   // Show loading spinner while determining initial route
   if (!isInitialized || isLoading) {
     return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        backgroundColor: '#FFFFFF' 
-      }}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={{
-          marginTop: 16,
-          fontSize: 16,
-          color: '#6B7280',
-          textAlign: 'center'
-        }}>
-          {!frameworkReady ? 'Starting TeamSync...' : 
-           !isInitialized ? 'Initializing...' : 
-           'Loading your account...'}
+      <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="$background">
+        <Spinner size="large" color="$blue10" />
+        <Text marginTop={16} fontSize={16} color="$gray8" textAlign="center">
+          {!frameworkReady ? 'Starting TeamSync...' :
+            !isInitialized ? 'Initializing...' :
+              'Loading your account...'}
         </Text>
         {user && (
-          <Text style={{
-            marginTop: 8,
-            fontSize: 14,
-            color: '#9CA3AF',
-            textAlign: 'center'
-          }}>
+          <Text marginTop={8} fontSize={14} color="$gray6" textAlign="center">
             Welcome back, {user.name}!
           </Text>
         )}
-      </View>
+      </YStack>
     );
   }
 
@@ -91,26 +78,25 @@ function AuthGate() {
 
 export default function RootLayout() {
   return (
-    <>
+    <TamaguiProvider config={tamaguiConfig}>
       <Stack screenOptions={{ headerShown: false }}>
         {/* Authentication Routes */}
         <Stack.Screen name="auth/login" />
         <Stack.Screen name="auth/register" />
         <Stack.Screen name="auth/otp-request" />
         <Stack.Screen name="auth/otp-verify" />
-        
+
         {/* Onboarding Route */}
         <Stack.Screen name="onboarding" />
-        
+
         {/* Main App Routes */}
         <Stack.Screen name="(tabs)" />
-        
+
         {/* Error Routes */}
         <Stack.Screen name="+not-found" />
       </Stack>
-      
       <AuthGate />
       <StatusBar style="auto" />
-    </>
+    </TamaguiProvider>
   );
 }

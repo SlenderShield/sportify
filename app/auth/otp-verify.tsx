@@ -1,105 +1,80 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  Alert
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
+import { KeyboardAvoidingView, Platform, Alert, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/hooks/useAuth';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Shield, ArrowLeft, RefreshCw } from 'lucide-react-native';
 import { ValidationUtils } from '@/lib/validation';
 import type { OTPVerification, ValidationError } from '@/types';
+import {
+  YStack,
+  XStack,
+  Text,
+  Button,
+  Input,
+  Separator,
+} from 'tamagui';
 
 export default function OtpVerifyScreen() {
   const { phone } = useLocalSearchParams<{ phone: string }>();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const inputRefs = useRef<(TextInput | null)[]>([]);
-  
-  const { 
-    verifyOTP, 
-    requestOTP, 
-    isLoading, 
-    error, 
-    clearError, 
+
+  const {
+    verifyOTP,
+    requestOTP,
+    isLoading,
+    error,
+    clearError,
     otpRequestId,
-    resendTimer 
+    resendTimer,
   } = useAuth();
 
   useEffect(() => {
-    // Focus first input on mount
     inputRefs.current[0]?.focus();
   }, []);
 
   const handleOtpChange = (value: string, index: number) => {
-    // Only allow digits
     if (value && !/^\d$/.test(value)) return;
-
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
-    // Clear validation errors when user starts typing
-    if (validationErrors.length > 0) {
-      setValidationErrors([]);
-    }
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto-submit when all fields are filled
-    if (value && index === 5 && newOtp.every(digit => digit !== '')) {
+    if (validationErrors.length > 0) setValidationErrors([]);
+    if (value && index < 5) inputRefs.current[index + 1]?.focus();
+    if (value && index === 5 && newOtp.every(d => d !== '')) {
       handleVerifyOTP(newOtp.join(''));
     }
   };
 
   const handleKeyPress = (key: string, index: number) => {
     if (key === 'Backspace' && !otp[index] && index > 0) {
-      // Focus previous input on backspace
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleVerifyOTP = async (otpCode?: string) => {
     clearError();
-    
     const code = otpCode || otp.join('');
-    
-    // Validate OTP
     const otpError = ValidationUtils.validateOTP(code);
     if (otpError) {
       setValidationErrors([otpError]);
       return;
     }
-    
     if (!phone) {
       Alert.alert('Error', 'Phone number is missing. Please go back and try again.');
       return;
     }
-
     setValidationErrors([]);
-    
     try {
       const verification: OTPVerification = {
         phone,
         otp: code,
-        requestId: otpRequestId || 'default'
+        requestId: otpRequestId || 'default',
       };
-      
       await verifyOTP(verification);
-      // Navigation is handled by the root layout
-    } catch (error) {
-      // Error is handled by the store
-      // Clear OTP on error
+    } catch {
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     }
@@ -107,25 +82,20 @@ export default function OtpVerifyScreen() {
 
   const handleResendOTP = async () => {
     if (!phone || resendTimer > 0) return;
-    
     try {
       await requestOTP({ phone });
       Alert.alert('Code Sent', 'A new verification code has been sent to your phone.');
-    } catch (error) {
-      // Error is handled by the store
-    }
+    } catch {}
   };
 
-  const getFieldError = (field: string) => {
-    return ValidationUtils.getErrorMessage(validationErrors, field);
-  };
+  const getFieldError = (field: string) =>
+    ValidationUtils.getErrorMessage(validationErrors, field);
 
-  const formatPhoneNumber = (phoneNumber: string) => {
-    // Format phone number for display (e.g., +1 234-567-8890)
-    if (phoneNumber.startsWith('+1') && phoneNumber.length === 12) {
-      return `+1 ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 8)}-${phoneNumber.slice(8)}`;
+  const formatPhoneNumber = (num: string) => {
+    if (num.startsWith('+1') && num.length === 12) {
+      return `+1 ${num.slice(2, 5)}-${num.slice(5, 8)}-${num.slice(8)}`;
     }
-    return phoneNumber;
+    return num;
   };
 
   const clearOtp = () => {
@@ -136,322 +106,133 @@ export default function OtpVerifyScreen() {
 
   if (!phone) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.errorScreen}>
-          <Text style={styles.errorText}>Phone number is missing</Text>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => router.back()}
-          >
-            <Text style={styles.backButtonText}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
+      <SafeAreaView style={{ flex: 1 }}>
+        <YStack flex={1} alignItems="center" justifyContent="center" gap="$4">
+          <Text color="$red10" fontSize="$6" fontWeight="600">
+            Phone number is missing
+          </Text>
+          <Button onPress={() => router.back()}>Go Back</Button>
+        </YStack>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        style={{ flex: 1 }}
       >
-        <View style={styles.content}>
+        <YStack flex={1} paddingHorizontal="$4" paddingTop="$4" backgroundColor="$background">
           {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
+          <XStack alignItems="center" justifyContent="space-between" marginBottom="$4">
+            <Button
+              chromeless
               onPress={() => router.back()}
-            >
-              <ArrowLeft size={24} color="#374151" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Verify Code</Text>
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={clearOtp}
-            >
-              <Text style={styles.clearButtonText}>Clear</Text>
-            </TouchableOpacity>
-          </View>
+              icon={<ArrowLeft size={24} color="$color" />}
+            />
+            <Text fontSize="$7" fontWeight="700">
+              Verify Code
+            </Text>
+            <Button chromeless onPress={clearOtp}>
+              <Text color="$blue10">Clear</Text>
+            </Button>
+          </XStack>
 
-          <View style={styles.body}>
-            <View style={styles.iconContainer}>
-              <Shield size={48} color="#3B82F6" />
-            </View>
-
-            <Text style={styles.title}>Enter verification code</Text>
-            <Text style={styles.subtitle}>
-              We've sent a 6-digit code to{'\n'}
-              <Text style={styles.phoneNumber}>{formatPhoneNumber(phone)}</Text>
+          <YStack alignItems="center" gap="$3" marginTop="$2">
+            <Shield size={48} color="#3B82F6" />
+            <Text fontSize="$6" fontWeight="600">
+              Enter verification code
+            </Text>
+            <Text textAlign="center" color="$gray11">
+  );
+              {`We’ve sent a 6-digit code to\n`}
+              <Text color="$blue10" fontWeight="600">
+                {formatPhoneNumber(phone)}
+              </Text>
             </Text>
 
-            {/* Global Error */}
             {error && (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
+              <Text color="$red10" marginTop="$2">
+                {error}
+              </Text>
             )}
 
-            {/* OTP Input */}
-            <View style={styles.otpContainer}>
-              <View style={styles.otpInputs}>
-                {otp.map((digit, index) => (
-                  <TextInput
-                    key={index}
-                    ref={ref => inputRefs.current[index] = ref}
-                    style={[
-                      styles.otpInput,
-                      digit && styles.otpInputFilled,
-                      getFieldError('otp') && styles.otpInputError
-                    ]}
-                    value={digit}
-                    onChangeText={(value) => handleOtpChange(value, index)}
-                    onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
-                    keyboardType="numeric"
-                    maxLength={1}
-                    selectTextOnFocus
-                  />
-                ))}
-              </View>
-              {getFieldError('otp') && (
-                <Text style={styles.fieldError}>{getFieldError('otp')}</Text>
-              )}
-            </View>
+            {/* OTP Inputs */}
+            <XStack gap="$3" marginTop="$3">
+              {otp.map((digit, idx) => (
+                <Input
+                  key={idx}
+                  ref={ref => { inputRefs.current[idx] = ref; }}
+                  value={digit}
+                  onChangeText={v => handleOtpChange(v, idx)}
+                  onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, idx)}
+                  keyboardType="numeric"
+                  maxLength={1}
+                  size="$6"
+                  textAlign="center"
+                  width={50}
+                  height={60}
+                  fontSize="$6"
+                  borderColor={
+                    getFieldError('otp') ? '$red10' : digit ? '$blue10' : '$gray6'
+                  }
+                  borderWidth={2}
+                  borderRadius="$4"
+                />
+              ))}
+            </XStack>
+            {getFieldError('otp') && (
+              <Text color="$red10" fontSize="$3">
+                {getFieldError('otp')}
+              </Text>
+            )}
 
-            {/* Resend Code */}
-            <View style={styles.resendContainer}>
+            {/* Resend */}
+            <YStack marginTop="$4" alignItems="center">
               {resendTimer > 0 ? (
-                <Text style={styles.timerText}>
-                  Resend code in {resendTimer}s
-                </Text>
+                <Text color="$gray10">Resend code in {resendTimer}s</Text>
               ) : (
-                <TouchableOpacity
-                  style={styles.resendButton}
+                <Button
+                  variant="outlined"
+                  borderColor="$blue10"
+                  color="$blue10"
+                  icon={<RefreshCw size={16} color="#3B82F6" />}
                   onPress={handleResendOTP}
                   disabled={isLoading}
                 >
-                  <RefreshCw size={16} color="#3B82F6" style={styles.resendIcon} />
-                  <Text style={styles.resendText}>Resend Code</Text>
-                </TouchableOpacity>
+                  Resend Code
+                </Button>
               )}
-            </View>
+            </YStack>
 
-            {/* Verify Button */}
-            <TouchableOpacity
-              style={[
-                styles.verifyButton, 
-                (isLoading || otp.some(digit => !digit)) && styles.disabledButton
-              ]}
+            {/* Verify */}
+            <Button
+              marginTop="$5"
+              size="$6"
+              backgroundColor="$blue10"
+              color="$white"
               onPress={() => handleVerifyOTP()}
-              disabled={isLoading || otp.some(digit => !digit)}
+              disabled={isLoading || otp.some(d => !d)}
+              opacity={isLoading || otp.some(d => !d) ? 0.5 : 1}
             >
-              <Text style={styles.verifyButtonText}>
-                {isLoading ? 'Verifying...' : 'Verify Code'}
-              </Text>
-            </TouchableOpacity>
+              {isLoading ? 'Verifying...' : 'Verify Code'}
+            </Button>
 
-            {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>
-                Didn't receive the code? Check your SMS or try again
+            <Separator marginVertical="$5" />
+
+            <YStack alignItems="center" gap="$2">
+              <Text color="$gray10">
+                Didn’t receive the code? Check your SMS or try again
               </Text>
-              <TouchableOpacity
-                style={styles.changeNumberButton}
-                onPress={() => router.back()}
-              >
-                <Text style={styles.changeNumberText}>Change phone number</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+              <Button chromeless onPress={() => router.back()}>
+                <Text color="$blue10">Change phone number</Text>
+              </Button>
+            </YStack>
+          </YStack>
+        </YStack>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  clearButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  clearButtonText: {
-    fontSize: 14,
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-  body: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 40,
-  },
-  iconContainer: {
-    alignSelf: 'center',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#EBF4FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-  },
-  phoneNumber: {
-    fontWeight: '600',
-    color: '#111827',
-  },
-  errorContainer: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
-  },
-  errorText: {
-    color: '#DC2626',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  errorScreen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  backButtonText: {
-    color: '#3B82F6',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  otpContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  otpInputs: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 8,
-  },
-  otpInput: {
-    width: 48,
-    height: 56,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#111827',
-    backgroundColor: '#F9FAFB',
-  },
-  otpInputFilled: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#EBF4FF',
-  },
-  otpInputError: {
-    borderColor: '#DC2626',
-    backgroundColor: '#FEF2F2',
-  },
-  fieldError: {
-    color: '#DC2626',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  resendContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  timerText: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  resendButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  resendIcon: {
-    marginRight: 6,
-  },
-  resendText: {
-    fontSize: 14,
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-  verifyButton: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  disabledButton: {
-    backgroundColor: '#9CA3AF',
-  },
-  verifyButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 12,
-  },
-  changeNumberButton: {
-    paddingVertical: 8,
-  },
-  changeNumberText: {
-    fontSize: 14,
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-});
