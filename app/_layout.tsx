@@ -5,13 +5,14 @@ import { Animated } from 'react-native';
 import { YStack, Text, Spinner } from 'tamagui';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useAuth } from '@/hooks/useAuth';
+import { ThemeProvider, useTheme } from '@/hooks/useTheme';
 import { TamaguiProvider } from 'tamagui';
 import tamaguiConfig from '../tamagui.config';
-import { useColorScheme } from 'react-native';
 
 function AuthGate() {
   const [isInitialized, setIsInitialized] = useState(false);
   const { isAuthenticated, hasCompletedOnboarding, isLoading, user, restoreSession } = useAuth();
+  const { isDark } = useTheme();
   const frameworkReady = useFrameworkReady();
   const fadeAnim = useRef(new Animated.Value(0)).current; // For fade-in effect
 
@@ -52,20 +53,52 @@ function AuthGate() {
 
   if (!isInitialized || isLoading) {
     return (
-      <YStack position="absolute" top={0} right={0} bottom={0} left={0} justifyContent="center" alignItems="center" backgroundColor="$background">
-        <Spinner size="large" color="$blue10" />
-        <Text marginTop={16} fontSize={16} color="$gray10" textAlign="center">
-          {!frameworkReady
-            ? 'Starting TeamSync...'
-            : !isInitialized
-            ? 'Initializing...'
-            : 'Loading your account...'}
-        </Text>
-        {user && (
-          <Text marginTop={8} fontSize={14} color="$gray7" textAlign="center">
-            Welcome back, {user.name}!
+      <YStack 
+        position="absolute" 
+        top={0} 
+        right={0} 
+        bottom={0} 
+        left={0} 
+        justifyContent="center" 
+        alignItems="center" 
+        backgroundColor="$background"
+      >
+        <YStack 
+          alignItems="center" 
+          backgroundColor="$backgroundElevated" 
+          padding="$8" 
+          borderRadius="$xxxl" 
+          shadowColor="$primary" 
+          shadowOffset={{ width: 0, height: 8 }} 
+          shadowOpacity={0.1} 
+          shadowRadius={24}
+          elevation={8}
+        >
+          <Spinner size="large" color="$primary" />
+          <Text 
+            marginTop="$6" 
+            fontSize={18} 
+            fontWeight="600" 
+            color="$text" 
+            textAlign="center"
+          >
+            {!frameworkReady
+              ? 'Starting TeamSync...'
+              : !isInitialized
+              ? 'Initializing...'
+              : 'Loading your account...'}
           </Text>
-        )}
+          {user && (
+            <Text 
+              marginTop="$3" 
+              fontSize={16} 
+              color="$textSecondary" 
+              textAlign="center"
+            >
+              Welcome back, {user.name}!
+            </Text>
+          )}
+        </YStack>
       </YStack>
     );
   }
@@ -73,14 +106,13 @@ function AuthGate() {
   return null;
 }
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function AppContent() {
+  const { isDark } = useTheme();
 
   return (
     <TamaguiProvider
       config={tamaguiConfig}
-      // defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}
-      defaultTheme="light"
+      defaultTheme={isDark ? 'dark' : 'light'}
     >
       <YStack flex={1}>
         <Stack screenOptions={{ headerShown: false }}>
@@ -103,8 +135,16 @@ export default function RootLayout() {
         {/* AuthGate handles initial session, loading, and routing */}
         <AuthGate />
 
-        <StatusBar style="auto" />
+        <StatusBar style={isDark ? 'light' : 'dark'} />
       </YStack>
     </TamaguiProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }

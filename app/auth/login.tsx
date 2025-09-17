@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef,useEffect } from 'react';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Eye, EyeOff, Mail, Lock, Smartphone, Chrome } from 'lucide-react-native';
-import { YStack, XStack, Text, Button, Input, Separator, ScrollView } from 'tamagui';
+import { Eye, EyeOff, Mail, Lock, Smartphone, Chrome, LogIn, Sparkles } from 'lucide-react-native';
+import { YStack, XStack, Text, Button, Input, Separator, ScrollView, View } from 'tamagui';
 import { LinearGradient } from 'tamagui/linear-gradient';
-import { Alert } from 'react-native';
+import { Alert, Pressable,Animated } from 'react-native';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 import { ValidationUtils } from '@/lib/validation';
 import type { LoginCredentials, ValidationError } from '@/types';
 
@@ -18,8 +19,28 @@ export default function LoginScreen() {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [isEmailFocused, setEmailFocused] = useState(false);
   const [isPasswordFocused, setPasswordFocused] = useState(false);
-
+  
+  const { isDark } = useTheme();
   const { loginWithEmail, isLoading, error, clearError } = useAuth();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  // Animate in on mount
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 100,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   const handleEmailLogin = async () => {
     clearError();
@@ -45,199 +66,383 @@ export default function LoginScreen() {
     ValidationUtils.getErrorMessage(validationErrors, field);
 
   return (
-    <YStack flex={1} background="$background" padding="$4" justifyContent="center">
-      <StatusBar style="dark" />
+    <YStack flex={1} backgroundColor="$background">
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      
+      {/* Background Elements */}
+      <View position="absolute" top={0} left={0} right={0} bottom={0}>
+        {/* Gradient Overlay */}
+        <View
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          height={300}
+          style={{
+            background: isDark 
+              ? 'linear-gradient(180deg, rgba(96, 165, 250, 0.1) 0%, rgba(30, 41, 59, 0) 100%)'
+              : 'linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, rgba(248, 250, 252, 0) 100%)',
+          }}
+        />
+        
+        {/* Decorative Elements */}
+        <View
+          position="absolute"
+          top={100}
+          right={-50}
+          width={150}
+          height={150}
+          borderRadius={75}
+          backgroundColor="$glassAccent"
+          opacity={0.3}
+        />
+        <View
+          position="absolute"
+          top={250}
+          left={-30}
+          width={100}
+          height={100}
+          borderRadius={50}
+          backgroundColor="$glassSecondary"
+          opacity={0.2}
+        />
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
-        {/* Header */}
-        <YStack marginBottom="$8" alignItems="center">
-          <Text fontSize={32} fontWeight="700" color="$gray12">
-            Welcome Back
-          </Text>
-          <Text color="$gray10" marginTop="$2" fontSize={16}>
-            Sign in to your TeamSync account
-          </Text>
-        </YStack>
-
-        {/* Card Container */}
-        <YStack
-          background="$background"
-          borderRadius="$6"
-          shadowColor="#000"
-          shadowOffset={{ width: 0, height: 4 }}
-          shadowOpacity={0.05}
-          shadowRadius={6}
-          padding="$5"
-          marginBottom="$8"
+        <Animated.View
+          style={{
+            flex: 1,
+            paddingHorizontal: 24,
+            paddingTop: 80,
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }}
         >
-          {/* Global Error */}
-          {error && (
-            <YStack
-              background="$red3"
-              padding="$3"
+          {/* Header */}
+          <YStack alignItems="center" marginBottom="$10">
+            <View
+              backgroundColor="$primary"
+              borderRadius="$full"
+              padding="$4"
               marginBottom="$5"
-              borderRadius="$5"
-              alignItems="center"
+              shadowColor="$primary"
+              shadowOffset={{ width: 0, height: 8 }}
+              shadowOpacity={0.25}
+              shadowRadius={16}
             >
-              <Text color="$red11">{error}</Text>
-            </YStack>
-          )}
-
-          {/* Email Login Form */}
-          <YStack space="$4">
-            <Text fontSize={18} fontWeight="600">
-              Sign in with Email
+              <LogIn size={32} color="$textInverse" />
+            </View>
+            
+            <Text fontSize={36} fontWeight="800" color="$text" textAlign="center">
+              Welcome Back
             </Text>
+            <Text color="$textSecondary" marginTop="$2" fontSize={16} textAlign="center">
+              Sign in to continue to SportSync
+            </Text>
+          </YStack>
 
-            {/* Email Field */}
-            <YStack space="$2">
-              <XStack
-                alignItems="center"
+          {/* Main Card */}
+          <YStack
+            backgroundColor="$backgroundElevated"
+            borderRadius="$xxl"
+            padding="$8"
+            marginBottom="$6"
+            borderWidth={1}
+            borderColor="$borderSubtle"
+            shadowColor="$primary"
+            shadowOffset={{ width: 0, height: 12 }}
+            shadowOpacity={0.08}
+            shadowRadius={24}
+            elevation={12}
+            style={{
+              backdropFilter: 'blur(20px)',
+            }}
+          >
+            {/* Global Error */}
+            {error && (
+              <YStack
+                backgroundColor="$errorSubtle"
+                borderColor="$error"
                 borderWidth={1}
-                borderColor={getFieldError('email') ? '$red10' : isEmailFocused ? '$blue10' : '$gray6'}
-                borderRadius="$5"
-                paddingHorizontal="$3"
-                paddingVertical="$2"
-                background="$background"
+                padding="$4"
+                marginBottom="$6"
+                borderRadius="$lg"
+                alignItems="center"
               >
-                <Mail size={20} color={isEmailFocused ? '#2563EB' : '#6B7280'} />
-                <Input
-                  flex={1}
-                  marginLeft="$2"
-                  placeholder="Email"
-                  value={credentials.email}
-                  onChangeText={(email) => setCredentials((prev) => ({ ...prev, email }))}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  onFocus={() => setEmailFocused(true)}
-                  onBlur={() => setEmailFocused(false)}
-                />
-              </XStack>
-              {getFieldError('email') && (
-                <Text color="$red10" fontSize={14}>
-                  {getFieldError('email')}
+                <Text color="$error" fontSize={14} fontWeight="500" textAlign="center">
+                  {error}
                 </Text>
-              )}
+              </YStack>
+            )}
+
+            {/* Form Header */}
+            <YStack marginBottom="$6">
+              <Text fontSize={20} fontWeight="700" color="$text" textAlign="center">
+                Sign in with Email
+              </Text>
+              <Text fontSize={14} color="$textTertiary" textAlign="center" marginTop="$2">
+                Enter your credentials to continue
+              </Text>
             </YStack>
 
-            {/* Password Field */}
-            <YStack space="$2">
-              <XStack
-                alignItems="center"
-                borderWidth={1}
-                borderColor={getFieldError('password') ? '$red10' : isPasswordFocused ? '$blue10' : '$gray6'}
-                borderRadius="$5"
-                paddingHorizontal="$3"
-                paddingVertical="$2"
-                background="$background"
-              >
-                <Lock size={20} color={isPasswordFocused ? '#2563EB' : '#6B7280'} />
-                <Input
-                  flex={1}
-                  marginLeft="$2"
-                  placeholder="Password"
-                  value={credentials.password}
-                  secureTextEntry={!showPassword}
-                  onChangeText={(password) => setCredentials((prev) => ({ ...prev, password }))}
-                  onFocus={() => setPasswordFocused(true)}
-                  onBlur={() => setPasswordFocused(false)}
-                />
-                <Button
-                  unstyled
-                  onPress={() => setShowPassword((p) => !p)}
-                  pressStyle={{ opacity: 0.7 }}
+            <YStack gap="$5">
+              {/* Email Field */}
+              <YStack gap="$2">
+                <Text fontSize={14} fontWeight="600" color="$text">
+                  Email Address
+                </Text>
+                <XStack
+                  alignItems="center"
+                  backgroundColor="$surface"
+                  borderWidth={2}
+                  borderColor={getFieldError('email') ? '$error' : isEmailFocused ? '$primary' : '$border'}
+                  borderRadius="$lg"
+                  paddingHorizontal="$4"
+                  paddingVertical="$3"
+                  shadowColor={isEmailFocused ? '$primary' : 'transparent'}
+                  shadowOffset={{ width: 0, height: 2 }}
+                  shadowOpacity={0.1}
+                  shadowRadius={4}
+                  elevation={isEmailFocused ? 2 : 0}
                 >
-                  {showPassword ? <EyeOff size={20} color="#6B7280" /> : <Eye size={20} color="#6B7280" />}
-                </Button>
-              </XStack>
-              {getFieldError('password') && (
-                <Text color="$red10" fontSize={14}>
-                  {getFieldError('password')}
-                </Text>
-              )}
-            </YStack>
+                  <Mail 
+                    size={20} 
+                    color={getFieldError('email') ? '$error' : isEmailFocused ? '$primary' : '$textTertiary'} 
+                  />
+                  <Input
+                    flex={1}
+                    marginLeft="$3"
+                    placeholder="Enter your email"
+                    placeholderTextColor="$textMuted"
+                    value={credentials.email}
+                    onChangeText={(email) => setCredentials((prev) => ({ ...prev, email }))}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    onFocus={() => setEmailFocused(true)}
+                    onBlur={() => setEmailFocused(false)}
+                    fontSize={16}
+                    borderWidth={0}
+                    backgroundColor="transparent"
+                  />
+                </XStack>
+                {getFieldError('email') && (
+                  <Text color="$error" fontSize={12} marginTop="$1">
+                    {getFieldError('email')}
+                  </Text>
+                )}
+              </YStack>
 
-            {/* Primary Login Button */}
-            <LinearGradient
-              colors={isLoading ? ['$gray6', '$gray6'] : ['$primary', '$secondary']}
-              style={{ borderRadius: 12, overflow: 'hidden', marginTop: 16 }}
-            >
-              <Button
-                unstyled
-                paddingVertical={16}
-                alignItems="center"
+              {/* Password Field */}
+              <YStack gap="$2">
+                <Text fontSize={14} fontWeight="600" color="$text">
+                  Password
+                </Text>
+                <XStack
+                  alignItems="center"
+                  backgroundColor="$surface"
+                  borderWidth={2}
+                  borderColor={getFieldError('password') ? '$error' : isPasswordFocused ? '$primary' : '$border'}
+                  borderRadius="$lg"
+                  paddingHorizontal="$4"
+                  paddingVertical="$3"
+                  shadowColor={isPasswordFocused ? '$primary' : 'transparent'}
+                  shadowOffset={{ width: 0, height: 2 }}
+                  shadowOpacity={0.1}
+                  shadowRadius={4}
+                  elevation={isPasswordFocused ? 2 : 0}
+                >
+                  <Lock 
+                    size={20} 
+                    color={getFieldError('password') ? '$error' : isPasswordFocused ? '$primary' : '$textTertiary'} 
+                  />
+                  <Input
+                    flex={1}
+                    marginLeft="$3"
+                    placeholder="Enter your password"
+                    placeholderTextColor="$textMuted"
+                    value={credentials.password}
+                    secureTextEntry={!showPassword}
+                    onChangeText={(password) => setCredentials((prev) => ({ ...prev, password }))}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                    fontSize={16}
+                    borderWidth={0}
+                    backgroundColor="transparent"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword((p) => !p)}
+                    style={{ padding: 4 }}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={20} color="$textTertiary" />
+                    ) : (
+                      <Eye size={20} color="$textTertiary" />
+                    )}
+                  </Pressable>
+                </XStack>
+                {getFieldError('password') && (
+                  <Text color="$error" fontSize={12} marginTop="$1">
+                    {getFieldError('password')}
+                  </Text>
+                )}
+              </YStack>
+
+              {/* Forgot Password Link */}
+              <XStack justifyContent="flex-end" marginTop="$2">
+                <Pressable
+                  onPress={() => Alert.alert('Forgot Password', 'Feature coming soon.')}
+                  style={{ padding: 8 }}
+                >
+                  <Text color="$primary" fontSize={14} fontWeight="500">
+                    Forgot password?
+                  </Text>
+                </Pressable>
+              </XStack>
+
+              {/* Primary Login Button */}
+              <Pressable
                 onPress={handleEmailLogin}
                 disabled={isLoading}
-                animation="quick"
+                style={{
+                  marginTop: 24,
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  opacity: isLoading ? 0.7 : 1,
+                }}
               >
-                <Text color="$white" fontWeight="600">
-                  {isLoading ? 'Signing In…' : 'Sign In'}
-                </Text>
-              </Button>
-            </LinearGradient>
+                <View
+                  backgroundColor="$primary"
+                  paddingVertical="$4"
+                  alignItems="center"
+                  justifyContent="center"
+                  shadowColor="$primary"
+                  shadowOffset={{ width: 0, height: 4 }}
+                  shadowOpacity={0.3}
+                  shadowRadius={12}
+                >
+                  <XStack alignItems="center" gap="$2">
+                    {isLoading && (
+                      <View
+                        width={20}
+                        height={20}
+                        borderRadius={10}
+                        borderWidth={2}
+                        borderColor="$textInverse"
+                        borderTopColor="transparent"
+                        animation="spin"
+                      />
+                    )}
+                    <Text color="$textInverse" fontSize={16} fontWeight="700">
+                      {isLoading ? 'Signing In...' : 'Sign In'}
+                    </Text>
+                  </XStack>
+                </View>
+              </Pressable>
+            </YStack>
 
-            {/* Forgot Password */}
-            <Button
-              variant="outlined"
-              marginTop="$2"
-              onPress={() => Alert.alert('Forgot Password', 'Feature coming soon.')}
-            >
-              <Text color="$blue10">Forgot Password?</Text>
-            </Button>
+            {/* Divider */}
+            <XStack alignItems="center" marginVertical="$8">
+              <View flex={1} height={1} backgroundColor="$border" />
+              <Text 
+                marginHorizontal="$4" 
+                color="$textTertiary" 
+                fontSize={14} 
+                fontWeight="500"
+                backgroundColor="$backgroundElevated"
+                paddingHorizontal="$2"
+              >
+                OR CONTINUE WITH
+              </Text>
+              <View flex={1} height={1} backgroundColor="$border" />
+            </XStack>
+
+            {/* Alternative Login Methods */}
+            <YStack gap="$4">
+              {/* Google */}
+              <Pressable
+                onPress={handleGoogleLogin}
+                disabled={isLoading}
+                style={{ opacity: isLoading ? 0.5 : 1 }}
+              >
+                <XStack
+                  alignItems="center"
+                  justifyContent="center"
+                  backgroundColor="$surface"
+                  borderWidth={2}
+                  borderColor="$border"
+                  borderRadius="$lg"
+                  paddingVertical="$4"
+                  gap="$3"
+                  shadowColor="#000"
+                  shadowOffset={{ width: 0, height: 2 }}
+                  shadowOpacity={0.05}
+                  shadowRadius={4}
+                  elevation={2}
+                >
+                  <Chrome size={20} color="#4285F4" />
+                  <Text color="$text" fontSize={16} fontWeight="600">
+                    Continue with Google
+                  </Text>
+                </XStack>
+              </Pressable>
+
+              {/* Phone */}
+              <Pressable
+                onPress={handlePhoneLogin}
+                disabled={isLoading}
+                style={{ opacity: isLoading ? 0.5 : 1 }}
+              >
+                <XStack
+                  alignItems="center"
+                  justifyContent="center"
+                  backgroundColor="$surface"
+                  borderWidth={2}
+                  borderColor="$border"
+                  borderRadius="$lg"
+                  paddingVertical="$4"
+                  gap="$3"
+                  shadowColor="#000"
+                  shadowOffset={{ width: 0, height: 2 }}
+                  shadowOpacity={0.05}
+                  shadowRadius={4}
+                  elevation={2}
+                >
+                  <Smartphone size={20} color="$secondary" />
+                  <Text color="$text" fontSize={16} fontWeight="600">
+                    Sign in with Phone
+                  </Text>
+                </XStack>
+              </Pressable>
+            </YStack>
           </YStack>
 
-          {/* Divider */}
-          <XStack alignItems="center" marginVertical="$5">
-            <Separator flex={1} />
-            <Text marginHorizontal="$3" color="$gray8" fontWeight="500">
-              OR
+          {/* Footer */}
+          <XStack 
+            justifyContent="center" 
+            alignItems="center" 
+            marginTop="$8" 
+            marginBottom="$6" 
+            gap="$2"
+          >
+            <Text color="$textSecondary" fontSize={16}>
+              Don't have an account?
             </Text>
-            <Separator flex={1} />
+            <Pressable onPress={() => router.push('/auth/register')}>
+              <Text color="$primary" fontSize={16} fontWeight="700">
+                Sign Up
+              </Text>
+            </Pressable>
           </XStack>
-
-          {/* Alternative Login Methods */}
-          <YStack space="$3">
-            {/* Google */}
-            <Button
-              size="$4"
-              variant="outlined"
-              borderColor="#4285F4"
-              onPress={handleGoogleLogin}
-              disabled={isLoading}
-            >
-              <XStack alignItems="center" space="$2">
-                <Chrome size={20} color="#4285F4" />
-                <Text color="#4285F4">Continue with Google</Text>
-              </XStack>
-            </Button>
-
-            {/* Phone */}
-            <Button
-              size="$4"
-              variant="outlined"
-              borderColor="#10B981"
-              onPress={handlePhoneLogin}
-              disabled={isLoading}
-            >
-              <XStack alignItems="center" space="$2">
-                <Smartphone size={20} color="#10B981" />
-                <Text color="#10B981">Sign in with Phone</Text>
-              </XStack>
-            </Button>
-          </YStack>
-        </YStack>
-
-        {/* Footer */}
-        <XStack justifyContent="center" space="$2" marginTop="$6">
-          <Text color="$gray10">Don't have an account?</Text>
-          <Button unstyled onPress={() => router.push('/auth/register')}>
-            <Text color="$blue10" fontWeight="600">
-              Sign Up
-            </Text>
-          </Button>
-        </XStack>
+          
+          {/* Extra spacing for keyboard */}
+          <View height={50} />
+        </Animated.View>
       </ScrollView>
     </YStack>
   );
