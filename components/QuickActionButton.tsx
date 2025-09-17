@@ -21,15 +21,19 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       <YStack alignItems="center">
         <View
           backgroundColor={color}
-          width={56}
-          height={56}
-          borderRadius={28}
+          width={64}
+          height={64}
+          borderRadius={32}
           alignItems="center"
           justifyContent="center"
-          marginBottom={8}
+          marginBottom={10}
           position="relative"
+          shadowColor={color}
+          shadowOffset={{ width: 0, height: 4 }}
+          shadowOpacity={0.18}
+          shadowRadius={10}
         >
-          <Icon size={24} color="#FFFFFF" />
+          <Icon size={28} color="#FFFFFF" />
           {badge !== undefined && badge > 0 && (
             <View
               position="absolute"
@@ -42,14 +46,16 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
               alignItems="center"
               justifyContent="center"
               paddingHorizontal={4}
+              borderWidth={2}
+              borderColor="#fff"
             >
-              <Text color="$background" fontSize={10} fontWeight="600">{badge > 99 ? '99+' : badge}</Text>
+              <Text color="$background" fontSize={11} fontWeight="700">{badge > 99 ? '99+' : badge}</Text>
             </View>
           )}
         </View>
-        <Text fontSize={12} fontWeight="500" color="$text" textAlign="center">{title}</Text>
+        <Text fontSize={13} fontWeight="700" color="$text" textAlign="center" marginTop={2}>{title}</Text>
       </YStack>
-  </Button>
+    </Button>
   );
 };
 

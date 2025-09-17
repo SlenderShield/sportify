@@ -1,14 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { YStack, XStack, Text, Input, Button, ScrollView, View } from 'tamagui';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { router } from 'expo-router';
@@ -64,49 +55,60 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <YStack flex={1} backgroundColor="$background">
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.content}>
+          <YStack flex={1} paddingVertical={20}>
             {/* Header */}
-            <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
+            <YStack alignItems="center" marginBottom={32}>
+              <Button
+                chromeless
+                position="absolute"
+                left={0}
+                top={0}
+                padding={8}
                 onPress={() => router.back()}
-              >
-                <ArrowLeft size={24} color="#374151" />
-              </TouchableOpacity>
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Join TeamSync and connect with your team</Text>
-            </View>
+                icon={<ArrowLeft size={24} color="#374151" />}
+              />
+              <Text fontSize={28} fontWeight="800" color="$text" marginBottom={8} marginTop={32}>Create Account</Text>
+              <Text fontSize={16} color="$secondary" textAlign="center" paddingHorizontal={20}>
+                Join TeamSync and connect with your team
+              </Text>
+            </YStack>
 
             {/* Global Error */}
             {error && (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
+              <YStack backgroundColor="$red2" borderColor="$red6" borderWidth={1} borderRadius={8} padding={12} marginBottom={20}>
+                <Text color="$red10" fontSize={14} textAlign="center">{error}</Text>
+              </YStack>
             )}
 
             {/* Registration Form */}
-            <View style={styles.form}>
+            <YStack flex={1}>
               {/* Name Field */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Full Name</Text>
-                <View style={[
-                  styles.inputContainer,
-                  getFieldError('name') && styles.inputError
-                ]}>
-                  <User size={20} color="#6B7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Full Name</Text>
+                <XStack
+                  alignItems="center"
+                  borderWidth={1}
+                  borderColor={getFieldError('name') ? "$red10" : "$border"}
+                  borderRadius={12}
+                  backgroundColor="$gray2"
+                  paddingHorizontal={8}
+                >
+                  <User size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
+                  <Input
+                    flex={1}
+                    borderWidth={0}
+                    backgroundColor="transparent"
                     placeholder="Enter your full name"
                     placeholderTextColor="#9CA3AF"
                     value={credentials.name}
@@ -114,22 +116,28 @@ export default function RegisterScreen() {
                     autoCapitalize="words"
                     autoCorrect={false}
                   />
-                </View>
+                </XStack>
                 {getFieldError('name') && (
-                  <Text style={styles.fieldError}>{getFieldError('name')}</Text>
+                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('name')}</Text>
                 )}
-              </View>
+              </YStack>
 
               {/* Email Field */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Email Address</Text>
-                <View style={[
-                  styles.inputContainer,
-                  getFieldError('email') && styles.inputError
-                ]}>
-                  <Mail size={20} color="#6B7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Email Address</Text>
+                <XStack
+                  alignItems="center"
+                  borderWidth={1}
+                  borderColor={getFieldError('email') ? "$red10" : "$border"}
+                  borderRadius={12}
+                  backgroundColor="$gray2"
+                  paddingHorizontal={8}
+                >
+                  <Mail size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
+                  <Input
+                    flex={1}
+                    borderWidth={0}
+                    backgroundColor="transparent"
                     placeholder="Enter your email"
                     placeholderTextColor="#9CA3AF"
                     value={credentials.email}
@@ -138,22 +146,28 @@ export default function RegisterScreen() {
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                </View>
+                </XStack>
                 {getFieldError('email') && (
-                  <Text style={styles.fieldError}>{getFieldError('email')}</Text>
+                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('email')}</Text>
                 )}
-              </View>
+              </YStack>
 
               {/* Password Field */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Password</Text>
-                <View style={[
-                  styles.inputContainer,
-                  getFieldError('password') && styles.inputError
-                ]}>
-                  <Lock size={20} color="#6B7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Password</Text>
+                <XStack
+                  alignItems="center"
+                  borderWidth={1}
+                  borderColor={getFieldError('password') ? "$red10" : "$border"}
+                  borderRadius={12}
+                  backgroundColor="$gray2"
+                  paddingHorizontal={8}
+                >
+                  <Lock size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
+                  <Input
+                    flex={1}
+                    borderWidth={0}
+                    backgroundColor="transparent"
                     placeholder="Create a strong password"
                     placeholderTextColor="#9CA3AF"
                     value={credentials.password}
@@ -162,35 +176,37 @@ export default function RegisterScreen() {
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                  <TouchableOpacity
+                  <Button
+                    chromeless
                     onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeIcon}
-                  >
-                    {showPassword ? (
-                      <EyeOff size={20} color="#6B7280" />
-                    ) : (
-                      <Eye size={20} color="#6B7280" />
-                    )}
-                  </TouchableOpacity>
-                </View>
+                    padding={8}
+                    icon={showPassword ? <EyeOff size={20} color="#6B7280" /> : <Eye size={20} color="#6B7280" />}
+                  />
+                </XStack>
                 {getFieldError('password') && (
-                  <Text style={styles.fieldError}>{getFieldError('password')}</Text>
+                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('password')}</Text>
                 )}
-                <Text style={styles.inputHint}>
+                <Text fontSize={12} color="$secondary" marginTop={4}>
                   Password must be at least 8 characters with uppercase, lowercase, and number
                 </Text>
-              </View>
+              </YStack>
 
               {/* Confirm Password Field */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Confirm Password</Text>
-                <View style={[
-                  styles.inputContainer,
-                  getFieldError('confirmPassword') && styles.inputError
-                ]}>
-                  <Lock size={20} color="#6B7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
+              <YStack marginBottom={20}>
+                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Confirm Password</Text>
+                <XStack
+                  alignItems="center"
+                  borderWidth={1}
+                  borderColor={getFieldError('confirmPassword') ? "$red10" : "$border"}
+                  borderRadius={12}
+                  backgroundColor="$gray2"
+                  paddingHorizontal={8}
+                >
+                  <Lock size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
+                  <Input
+                    flex={1}
+                    borderWidth={0}
+                    backgroundColor="transparent"
                     placeholder="Confirm your password"
                     placeholderTextColor="#9CA3AF"
                     value={credentials.confirmPassword}
@@ -199,198 +215,55 @@ export default function RegisterScreen() {
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
-                  <TouchableOpacity
+                  <Button
+                    chromeless
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={styles.eyeIcon}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff size={20} color="#6B7280" />
-                    ) : (
-                      <Eye size={20} color="#6B7280" />
-                    )}
-                  </TouchableOpacity>
-                </View>
+                    padding={8}
+                    icon={showConfirmPassword ? <EyeOff size={20} color="#6B7280" /> : <Eye size={20} color="#6B7280" />}
+                  />
+                </XStack>
                 {getFieldError('confirmPassword') && (
-                  <Text style={styles.fieldError}>{getFieldError('confirmPassword')}</Text>
+                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('confirmPassword')}</Text>
                 )}
-              </View>
+              </YStack>
 
               {/* Register Button */}
-              <TouchableOpacity
-                style={[styles.registerButton, isLoading && styles.disabledButton]}
-                onPress={handleRegister}
+              <Button
+                backgroundColor="$primary"
+                borderRadius={12}
+                paddingVertical={16}
+                alignItems="center"
+                marginTop={8}
                 disabled={isLoading}
+                opacity={isLoading ? 0.6 : 1}
+                onPress={handleRegister}
               >
-                <Text style={styles.registerButtonText}>
+                <Text color="$background" fontSize={16} fontWeight="700">
                   {isLoading ? 'Creating Account...' : 'Create Account'}
                 </Text>
-              </TouchableOpacity>
-            </View>
+              </Button>
+            </YStack>
 
             {/* Terms */}
-            <View style={styles.termsContainer}>
-              <Text style={styles.termsText}>
+            <YStack marginVertical={20} paddingHorizontal={8}>
+              <Text fontSize={12} color="$secondary" textAlign="center" lineHeight={18}>
                 By creating an account, you agree to our{' '}
-                <Text style={styles.termsLink}>Terms of Service</Text>
+                <Text color="$primary" fontWeight="700">Terms of Service</Text>
                 {' '}and{' '}
-                <Text style={styles.termsLink}>Privacy Policy</Text>
+                <Text color="$primary" fontWeight="700">Privacy Policy</Text>
               </Text>
-            </View>
+            </YStack>
 
             {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account? </Text>
-              <TouchableOpacity onPress={() => router.back()}>
-                <Text style={styles.signInText}>Sign In</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+            <XStack justifyContent="center" alignItems="center" paddingBottom={20}>
+              <Text fontSize={16} color="$secondary">Already have an account? </Text>
+              <Button chromeless onPress={() => router.back()}>
+                <Text fontSize={16} color="$primary" fontWeight="700">Sign In</Text>
+              </Button>
+            </XStack>
+          </YStack>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </YStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-  },
-  content: {
-    flex: 1,
-    paddingVertical: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    padding: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
-    marginTop: 32,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  errorContainer: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
-  },
-  errorText: {
-    color: '#DC2626',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  form: {
-    flex: 1,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    backgroundColor: '#F9FAFB',
-  },
-  inputError: {
-    borderColor: '#DC2626',
-  },
-  inputIcon: {
-    marginLeft: 16,
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: '#111827',
-  },
-  eyeIcon: {
-    padding: 16,
-  },
-  fieldError: {
-    color: '#DC2626',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  inputHint: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
-  },
-  registerButton: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  registerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  termsContainer: {
-    marginVertical: 20,
-    paddingHorizontal: 8,
-  },
-  termsText: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  termsLink: {
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
-  footerText: {
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  signInText: {
-    fontSize: 16,
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-});

@@ -46,44 +46,56 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match, onPress }) => {
 
   return (
     <Button chromeless onPress={onPress} width="100%" padding={0}>
-      <YStack backgroundColor="$background" borderRadius="$lg" padding="$md" marginBottom="$md" borderWidth={1} borderColor="$border">
-        <XStack justifyContent="space-between" alignItems="center" marginBottom="$md">
-          <YStack backgroundColor={getStatusColor()} borderRadius={12} paddingHorizontal={8} paddingVertical={4}>
-            <Text color="$background" fontSize={10} fontWeight="600">{getStatusText()}</Text>
+      <YStack
+        backgroundColor="$background"
+        borderRadius={24}
+        padding={20}
+        marginBottom={20}
+        borderWidth={1}
+        borderColor="$border"
+        shadowColor="#3B82F6"
+        shadowOffset={{ width: 0, height: 8 }}
+        shadowOpacity={0.10}
+        shadowRadius={16}
+        elevation={6}
+      >
+        <XStack justifyContent="space-between" alignItems="center" marginBottom={16}>
+          <YStack backgroundColor={getStatusColor()} borderRadius={16} paddingHorizontal={12} paddingVertical={6}>
+            <Text color="$background" fontSize={12} fontWeight="700">{getStatusText()}</Text>
           </YStack>
           <XStack alignItems="center">
-            <Calendar size={14} color="$secondary" />
-            <Text fontSize={12} color="$secondary" marginLeft={4}>{formatDate(match.date)}</Text>
+            <Calendar size={16} color="$secondary" />
+            <Text fontSize={14} color="$secondary" marginLeft={6}>{formatDate(match.date)}</Text>
           </XStack>
         </XStack>
         <YStack alignItems="center">
-          <XStack justifyContent="space-between" alignItems="center" width="100%" marginBottom="$md">
+          <XStack justifyContent="space-between" alignItems="center" width="100%" marginBottom={16}>
             <YStack alignItems="center" flex={1}>
-              <Text fontSize={16} fontWeight="600" color="$text" textAlign="center" marginBottom={4}>{match.homeTeam}</Text>
-              <Text fontSize={10} color="$secondary" fontWeight="500">HOME</Text>
+              <Text fontSize={18} fontWeight="700" color="$text" textAlign="center" marginBottom={4}>{match.homeTeam}</Text>
+              <Text fontSize={11} color="$secondary" fontWeight="500">HOME</Text>
             </YStack>
-            <YStack marginInline={16} alignItems="center">
+            <YStack marginHorizontal={20} alignItems="center">
               {match.score ? (
-                <YStack background="$background" paddingHorizontal={12} paddingVertical={6} borderRadius={8}>
-                  <Text fontSize={18} fontWeight="bold" color="$text">{match.score.home} - {match.score.away}</Text>
+                <YStack background="$background" paddingHorizontal={16} paddingVertical={8} borderRadius={12} shadowColor="#3B82F6" shadowOffset={{ width: 0, height: 2 }} shadowOpacity={0.08} shadowRadius={6}>
+                  <Text fontSize={20} fontWeight="bold" color="$text">{match.score.home} - {match.score.away}</Text>
                 </YStack>
               ) : (
-                <Text fontSize={14} fontWeight="600" color="$secondary">VS</Text>
+                <Text fontSize={16} fontWeight="700" color="$secondary">VS</Text>
               )}
             </YStack>
             <YStack alignItems="center" flex={1}>
-              <Text fontSize={16} fontWeight="600" color="$text" textAlign="center" marginBottom={4}>{match.awayTeam}</Text>
-              <Text fontSize={10} color="$secondary" fontWeight="500">AWAY</Text>
+              <Text fontSize={18} fontWeight="700" color="$text" textAlign="center" marginBottom={4}>{match.awayTeam}</Text>
+              <Text fontSize={11} color="$secondary" fontWeight="500">AWAY</Text>
             </YStack>
           </XStack>
-          <XStack justifyContent="center" gap={20}>
+          <XStack justifyContent="center" gap={32}>
             <XStack alignItems="center">
               <Clock size={16} color="$secondary" />
-              <Text fontSize={12} color="$secondary" marginLeft={4}>{match.time}</Text>
+              <Text fontSize={13} color="$secondary" marginLeft={6}>{match.time}</Text>
             </XStack>
             <XStack alignItems="center">
               <MapPin size={16} color="$secondary" />
-              <Text fontSize={12} color="$secondary" marginLeft={4}>{match.venue}</Text>
+              <Text fontSize={13} color="$secondary" marginLeft={6}>{match.venue}</Text>
             </XStack>
           </XStack>
         </YStack>

@@ -61,16 +61,34 @@ export default function DashboardScreen() {
       <ScrollView
         backgroundColor="$background"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        contentContainerStyle={{ paddingBottom: 32 }}
       >
-        <YStack space="$md">
-          <YStack backgroundColor="$primary" padding="$lg" paddingTop={60}>
-            <Text fontSize={28} fontWeight="bold" color="$background">Hello, {user?.name}!</Text>
-            <Text fontSize={16} color="$secondary">Ready for your next match?</Text>
+        <YStack space="$lg">
+          {/* Header with gradient */}
+          <YStack
+            paddingHorizontal="$lg"
+            paddingTop={60}
+            paddingBottom={32}
+            borderBottomLeftRadius={32}
+            borderBottomRightRadius={32}
+            backgroundImage="linear-gradient(90deg, #3B82F6 0%, #10B981 100%)"
+            shadowColor="#3B82F6"
+            shadowOffset={{ width: 0, height: 8 }}
+            shadowOpacity={0.15}
+            shadowRadius={16}
+            elevation={8}
+          >
+            <Text fontSize={32} fontWeight="800" color="$background" marginBottom={4}>
+              {user?.name ? `Hello, ${user.name}!` : 'Welcome!'}
+            </Text>
+            <Text fontSize={18} color="$background" opacity={0.85}>
+              Ready for your next match?
+            </Text>
           </YStack>
           {/* Quick Actions */}
-          <YStack padding="$lg">
-            <Text fontSize={20} fontWeight="600" color="$text">Quick Actions</Text>
-            <XStack space="$md" flexWrap="wrap" justifyContent="space-between">
+          <YStack paddingHorizontal="$lg" marginTop={-32}>
+            <Text fontSize={18} fontWeight="700" color="$text" marginBottom={8}>Quick Actions</Text>
+            <XStack gap={16} flexWrap="wrap" justifyContent="space-between">
               <QuickActionButton icon={MessageCircle} title="Chat" onPress={() => router.push('/chat')} color="#10B981" />
               <QuickActionButton icon={Calendar} title="Calendar" onPress={() => router.push('/calendar')} color="#3B82F6" />
               <QuickActionButton icon={Map} title="Maps" onPress={() => router.push('/maps')} color="#F59E0B" />
@@ -78,11 +96,11 @@ export default function DashboardScreen() {
             </XStack>
           </YStack>
           {/* Upcoming Matches */}
-          <YStack padding="$lg">
-            <XStack alignItems="center" justifyContent="space-between" marginBottom="$md">
-              <Text fontSize={20} fontWeight="600" color="$text">Upcoming Matches</Text>
-              <Button chromeless>
-                <Text color="$primary">See All</Text>
+          <YStack paddingHorizontal="$lg" marginTop={8}>
+            <XStack alignItems="center" justifyContent="space-between" marginBottom={12}>
+              <Text fontSize={20} fontWeight="700" color="$text">Upcoming Matches</Text>
+              <Button chromeless borderRadius={20} backgroundColor="$primary" paddingHorizontal={16} paddingVertical={6}>
+                <Text color="$background" fontWeight="600">See All</Text>
               </Button>
             </XStack>
             {upcomingMatches.length > 0 ? (
@@ -90,17 +108,17 @@ export default function DashboardScreen() {
                 <MatchCard key={match.id} match={match} />
               ))
             ) : (
-              <YStack padding="$lg" alignItems="center" borderRadius="$lg" borderWidth={1} borderColor="$border" backgroundColor="$background">
+              <YStack padding="$lg" alignItems="center" borderRadius={20} borderWidth={1} borderColor="$border" backgroundColor="$background" shadowColor="#3B82F6" shadowOffset={{ width: 0, height: 4 }} shadowOpacity={0.08} shadowRadius={8}>
                 <Text color="$secondary" fontSize={16}>No upcoming matches</Text>
               </YStack>
             )}
           </YStack>
           {/* This Week's Events */}
-          <YStack padding="$lg">
-            <XStack alignItems="center" justifyContent="space-between" marginBottom="$md">
-              <Text fontSize={20} fontWeight="600" color="$text">This Week</Text>
-              <Button chromeless onPress={() => router.push('/calendar')}>
-                <Plus size={20} color="#3B82F6" />
+          <YStack paddingHorizontal="$lg" marginTop={8}>
+            <XStack alignItems="center" justifyContent="space-between" marginBottom={12}>
+              <Text fontSize={20} fontWeight="700" color="$text">This Week</Text>
+              <Button chromeless borderRadius={20} backgroundColor="$primary" paddingHorizontal={12} paddingVertical={6} onPress={() => router.push('/calendar')}>
+                <Plus size={20} color="#fff" />
               </Button>
             </XStack>
             {upcomingEvents.length > 0 ? (
@@ -108,7 +126,7 @@ export default function DashboardScreen() {
                 <CalendarEventCard key={event.id} event={event} />
               ))
             ) : (
-              <YStack padding="$lg" alignItems="center" borderRadius="$lg" borderWidth={1} borderColor="$border" backgroundColor="$background">
+              <YStack padding="$lg" alignItems="center" borderRadius={20} borderWidth={1} borderColor="$border" backgroundColor="$background" shadowColor="#10B981" shadowOffset={{ width: 0, height: 4 }} shadowOpacity={0.08} shadowRadius={8}>
                 <Text color="$secondary" fontSize={16}>No events this week</Text>
               </YStack>
             )}

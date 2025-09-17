@@ -52,46 +52,57 @@ export const CalendarEventCard: React.FC<CalendarEventCardProps> = ({
   };
 
   return (
-    <YStack backgroundColor="$background" borderRadius={12} padding={16} marginBottom={12} borderWidth={1} borderColor="$border">
-      <XStack justifyContent="space-between" alignItems="center" marginBottom={12}>
-        <YStack backgroundColor={getTypeColor()} borderRadius={12} paddingHorizontal={8} paddingVertical={4}>
-          <Text color="$background" fontSize={10} fontWeight="600" textTransform="uppercase">{getTypeLabel()}</Text>
+    <YStack
+      backgroundColor="$background"
+      borderRadius={24}
+      padding={20}
+      marginBottom={20}
+      borderWidth={1}
+      borderColor="$border"
+      shadowColor="#10B981"
+      shadowOffset={{ width: 0, height: 8 }}
+      shadowOpacity={0.10}
+      shadowRadius={16}
+    >
+      <XStack justifyContent="space-between" alignItems="center" marginBottom={16}>
+        <YStack backgroundColor={getTypeColor()} borderRadius={16} paddingHorizontal={12} paddingVertical={6}>
+          <Text color="$background" fontSize={12} fontWeight="700" textTransform="uppercase">{getTypeLabel()}</Text>
         </YStack>
-        <XStack flexDirection="row" gap={8}>
+        <XStack flexDirection="row" gap={10}>
           {onToggleReminder && (
             <Button chromeless onPress={() => onToggleReminder(event.id)}>
               {event.reminder ? (
-                <Bell size={18} color="$primary" />
+                <Bell size={20} color="$primary" />
               ) : (
-                <BellOff size={18} color="$secondary" />
+                <BellOff size={20} color="$secondary" />
               )}
             </Button>
           )}
           {onDelete && (
             <Button chromeless onPress={() => onDelete(event.id)}>
-              <Trash2 size={18} color="$danger" />
+              <Trash2 size={20} color="$danger" />
             </Button>
           )}
         </XStack>
       </XStack>
-      <YStack gap={8}>
-        <Text fontSize={16} fontWeight="600" color="$text">{event.title}</Text>
+      <YStack gap={10}>
+        <Text fontSize={18} fontWeight="700" color="$text">{event.title}</Text>
         {event.description && (
-          <Text fontSize={14} color="$secondary" lineHeight={18} numberOfLines={2}>{event.description}</Text>
+          <Text fontSize={15} color="$secondary" lineHeight={20} numberOfLines={2}>{event.description}</Text>
         )}
-        <YStack gap={6}>
-          <XStack alignItems="center" gap={6}>
-            <Calendar size={14} color="$secondary" />
-            <Text fontSize={12} color="$secondary">{formatDate(event.date)}</Text>
+        <YStack gap={8}>
+          <XStack alignItems="center" gap={8}>
+            <Calendar size={16} color="$secondary" />
+            <Text fontSize={13} color="$secondary">{formatDate(event.date)}</Text>
           </XStack>
-          <XStack alignItems="center" gap={6}>
-            <Clock size={14} color="$secondary" />
-            <Text fontSize={12} color="$secondary">{formatTime(event.time)}</Text>
+          <XStack alignItems="center" gap={8}>
+            <Clock size={16} color="$secondary" />
+            <Text fontSize={13} color="$secondary">{formatTime(event.time)}</Text>
           </XStack>
           {event.location && (
-            <XStack alignItems="center" gap={6}>
-              <MapPin size={14} color="$secondary" />
-              <Text fontSize={12} color="$secondary">{event.location}</Text>
+            <XStack alignItems="center" gap={8}>
+              <MapPin size={16} color="$secondary" />
+              <Text fontSize={13} color="$secondary">{event.location}</Text>
             </XStack>
           )}
         </YStack>

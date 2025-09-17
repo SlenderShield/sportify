@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { Button, Text, XStack } from 'tamagui';
+import { Alert } from 'react-native';
 // TODO: Import expo-auth-session when implementing
 // import * as AuthSession from 'expo-auth-session';
 // import * as WebBrowser from 'expo-web-browser';
@@ -44,37 +45,25 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.button, disabled && styles.disabledButton]}
-      onPress={handleGoogleLogin}
+    <Button
+      chromeless
+      backgroundColor="$background"
+      borderWidth={1}
+      borderColor="$border"
+      borderRadius={12}
+      paddingVertical={16}
+      marginBottom={12}
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
       disabled={disabled}
+      opacity={disabled ? 0.6 : 1}
+      onPress={handleGoogleLogin}
     >
       {/* TODO: Add Google logo SVG */}
-      <Text style={styles.buttonText}>Continue with Google</Text>
-    </TouchableOpacity>
+      <Text fontSize={16} fontWeight="600" color="$text">Continue with Google</Text>
+    </Button>
   );
 };
 
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    paddingVertical: 16,
-    marginBottom: 12,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
-  },
-});
-
-export default GoogleAuthButton;
+// ...existing code...

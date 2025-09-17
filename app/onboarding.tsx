@@ -1,25 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  Dimensions 
-} from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  Users, 
-  MessageCircle, 
-  Calendar, 
-  Bell, 
-  Map, 
-  Trophy,
-  ChevronRight
-} from 'lucide-react-native';
+import { YStack, XStack, Text, Button, ScrollView, Theme, styled } from 'tamagui';
+import { Users, MessageCircle, Calendar, Bell, Map, Trophy, ChevronRight } from 'lucide-react-native';
 
-const { width } = Dimensions.get('window');
+
 
 interface OnboardingSlide {
   id: number;
@@ -93,176 +78,78 @@ export default function OnboardingScreen() {
   const IconComponent = slide.icon;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>Skip</Text>
-        </TouchableOpacity>
-      </View>
+    <YStack flex={1} backgroundColor="$background">
+      {/* Header */}
+      <XStack justifyContent="flex-end" alignItems="center" paddingHorizontal={20} paddingTop={60} paddingBottom={20}>
+        <Button
+          chromeless
+          onPress={handleSkip}
+          paddingHorizontal={16}
+          paddingVertical={8}
+        >
+          <Text fontSize={16} color="$gray10" fontWeight="500">Skip</Text>
+        </Button>
+      </XStack>
 
-      <ScrollView 
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.slideContainer}>
-          <View style={[styles.iconContainer, { backgroundColor: slide.color }]}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20 }} showsVerticalScrollIndicator={false}>
+        <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical={40}>
+          <YStack width={120} height={120} borderRadius={60} alignItems="center" justifyContent="center" marginBottom={32} style={{ backgroundColor: slide.color }}>
             <IconComponent size={60} color="#FFFFFF" />
-          </View>
-
-          <Text style={styles.title}>{slide.title}</Text>
-          <Text style={[styles.subtitle, { color: slide.color }]}>
-            {slide.subtitle}
-          </Text>
-          <Text style={styles.description}>{slide.description}</Text>
-        </View>
+          </YStack>
+          <Text fontSize={28} fontWeight="bold" color="$color" textAlign="center" marginBottom={8}>{slide.title}</Text>
+          <Text fontSize={18} fontWeight="600" textAlign="center" marginBottom={16} style={{ color: slide.color }}>{slide.subtitle}</Text>
+          <Text fontSize={16} color="$gray10" textAlign="center" lineHeight={24} paddingHorizontal={20}>{slide.description}</Text>
+        </YStack>
 
         {/* Progress Indicators */}
-        <View style={styles.progressContainer}>
+        <XStack justifyContent="center" alignItems="center" paddingVertical={32}>
           {slides.map((_, index) => (
-            <View
+            <YStack
               key={index}
-              style={[
-                styles.progressDot,
-                {
-                  backgroundColor: index === currentSlide ? slide.color : '#E5E7EB',
-                  width: index === currentSlide ? 32 : 8,
-                }
-              ]}
+              height={8}
+              borderRadius={4}
+              marginHorizontal={4}
+              width={index === currentSlide ? 32 : 8}
+              style={{ backgroundColor: index === currentSlide ? slide.color : '#E5E7EB' }}
             />
           ))}
-        </View>
+        </XStack>
       </ScrollView>
 
-      <View style={styles.footer}>
-        <View style={styles.navigationContainer}>
-          {currentSlide > 0 && (
-            <TouchableOpacity 
-              onPress={handleBack} 
-              style={[styles.navButton, styles.backButton]}
+      {/* Footer Navigation */}
+      <YStack paddingHorizontal={20} paddingBottom={40}>
+        <XStack justifyContent="space-between" alignItems="center">
+          {currentSlide > 0 ? (
+            <Button
+              onPress={handleBack}
+              backgroundColor="$gray3"
+              paddingHorizontal={32}
+              paddingVertical={16}
+              borderRadius={12}
+              minWidth={120}
             >
-              <Text style={styles.backButtonText}>Back</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity 
+              <Text fontSize={16} fontWeight="600" color="$gray10">Back</Text>
+            </Button>
+          ) : <YStack minWidth={120} />}
+          <Button
             onPress={handleContinue}
-            style={[styles.navButton, styles.continueButton, { backgroundColor: slide.color }]}
+            backgroundColor={slide.color}
+            paddingHorizontal={32}
+            paddingVertical={16}
+            borderRadius={12}
+            minWidth={120}
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="center"
+            // gap is not a valid prop, so use marginLeft on icon
           >
-            <Text style={styles.continueButtonText}>
+            <Text fontSize={16} fontWeight="600" color="#FFFFFF">
               {currentSlide === slides.length - 1 ? 'Get Started' : 'Continue'}
             </Text>
-            <ChevronRight size={20} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+            <ChevronRight size={20} color="#FFFFFF" style={{ marginLeft: 8 }} />
+          </Button>
+        </XStack>
+      </YStack>
+    </YStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  skipButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  skipText: {
-    fontSize: 16,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  slideContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 32,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111827',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  description: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 32,
-  },
-  progressDot: {
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  navigationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  navButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 120,
-  },
-  backButton: {
-    backgroundColor: '#F3F4F6',
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  continueButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  continueButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-});

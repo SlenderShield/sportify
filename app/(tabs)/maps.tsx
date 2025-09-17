@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { YStack, XStack, Text, Button, ScrollView, View } from 'tamagui';
+import { Alert } from 'react-native';
 import { openMaps, openDirections } from '@/lib/maps';
 import { MapPin, Navigation, Clock, Users } from 'lucide-react-native';
 
@@ -63,249 +63,110 @@ export default function MapsScreen() {
   };
 
   const renderVenueCard = (venue: typeof venues[0]) => (
-    <View key={venue.id} style={styles.venueCard}>
-      <View style={styles.venueHeader}>
-        <View style={styles.venueInfo}>
-          <Text style={styles.venueName}>{venue.name}</Text>
-          <View style={styles.addressContainer}>
-            <MapPin size={16} color="#6B7280" />
-            <Text style={styles.venueAddress}>{venue.address}</Text>
-          </View>
-        </View>
-      </View>
-
+    <YStack
+      key={venue.id}
+      backgroundColor="$background"
+      borderRadius={20}
+      padding={20}
+      marginBottom={20}
+      borderWidth={1}
+      borderColor="$border"
+      shadowColor="#3B82F6"
+      shadowOffset={{ width: 0, height: 8 }}
+      shadowOpacity={0.08}
+      shadowRadius={16}
+    >
+      <YStack marginBottom={12}>
+        <Text fontSize={18} fontWeight="700" color="$text" marginBottom={4}>{venue.name}</Text>
+        <XStack alignItems="center">
+          <MapPin size={16} color="$secondary" />
+          <Text fontSize={14} color="$secondary" marginLeft={6}>{venue.address}</Text>
+        </XStack>
+      </YStack>
       {venue.nextEvent && (
-        <View style={styles.nextEventContainer}>
-          <Clock size={16} color="#3B82F6" />
-          <View style={styles.nextEventInfo}>
-            <Text style={styles.nextEventTitle}>{venue.nextEvent}</Text>
-            <Text style={styles.nextEventTime}>
-              {formatEventTime(venue.eventTime)}
-            </Text>
-          </View>
-        </View>
+        <XStack alignItems="center" backgroundColor="$blue2" padding={12} borderRadius={12} marginBottom={16}>
+          <Clock size={16} color="$primary" />
+          <YStack marginLeft={10} flex={1}>
+            <Text fontSize={14} fontWeight="600" color="$primary" marginBottom={2}>{venue.nextEvent}</Text>
+            <Text fontSize={12} color="$secondary">{formatEventTime(venue.eventTime)}</Text>
+          </YStack>
+        </XStack>
       )}
-
-      <View style={styles.venueActions}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.primaryButton]}
+      <XStack gap={12}>
+        <Button
+          flex={1}
+          borderRadius={12}
+          backgroundColor="$primary"
           onPress={() => handleGetDirections(venue)}
+          icon={<Navigation size={18} color="#fff" />}
         >
-          <Navigation size={18} color="#FFFFFF" />
-          <Text style={styles.primaryButtonText}>Directions</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.actionButton, styles.secondaryButton]}
+          <Text color="$background" fontWeight="700">Directions</Text>
+        </Button>
+        <Button
+          flex={1}
+          borderRadius={12}
+          backgroundColor="$blue2"
+          borderWidth={1}
+          borderColor="$primary"
           onPress={() => handleOpenMaps(venue)}
+          icon={<MapPin size={18} color="#3B82F6" />}
         >
-          <MapPin size={18} color="#3B82F6" />
-          <Text style={styles.secondaryButtonText}>View on Map</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <Text color="$primary" fontWeight="700">View on Map</Text>
+        </Button>
+      </XStack>
+    </YStack>
   );
 
   const renderQuickActions = () => (
-    <View style={styles.quickActionsContainer}>
-      <Text style={styles.sectionTitle}>Quick Actions</Text>
-      
-      <TouchableOpacity
-        style={styles.quickActionButton}
+    <YStack padding={20} backgroundColor="$background" borderRadius={20} marginBottom={16}>
+      <Text fontSize={18} fontWeight="700" color="$text" marginBottom={16}>Quick Actions</Text>
+      <Button
+        chromeless
+        borderRadius={14}
+        backgroundColor="$blue2"
+        flexDirection="row"
+        alignItems="center"
+        paddingVertical={16}
+        marginBottom={12}
         onPress={() => openMaps()}
+        icon={<MapPin size={24} color="#3B82F6" />}
       >
-        <MapPin size={24} color="#3B82F6" />
-        <View style={styles.quickActionInfo}>
-          <Text style={styles.quickActionTitle}>Open Maps</Text>
-          <Text style={styles.quickActionDescription}>
-            Explore nearby locations and venues
-          </Text>
-        </View>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.quickActionButton}
-        onPress={() => {
-          // TODO: Get user's current location and search for nearby sports facilities
-          openMaps('sports facilities near me');
-        }}
+        <YStack marginLeft={16} flex={1} alignItems="flex-start">
+          <Text fontSize={16} fontWeight="600" color="$primary">Open Maps</Text>
+          <Text fontSize={14} color="$secondary">Explore nearby locations and venues</Text>
+        </YStack>
+      </Button>
+      <Button
+        chromeless
+        borderRadius={14}
+        backgroundColor="$green2"
+        flexDirection="row"
+        alignItems="center"
+        paddingVertical={16}
+        onPress={() => openMaps('sports facilities near me')}
+        icon={<Users size={24} color="#10B981" />}
       >
-        <Users size={24} color="#10B981" />
-        <View style={styles.quickActionInfo}>
-          <Text style={styles.quickActionTitle}>Find Sports Venues</Text>
-          <Text style={styles.quickActionDescription}>
-            Discover sports facilities in your area
-          </Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+        <YStack marginLeft={16} flex={1} alignItems="flex-start">
+          <Text fontSize={16} fontWeight="600" color="$green10">Find Sports Venues</Text>
+          <Text fontSize={14} color="$secondary">Discover sports facilities in your area</Text>
+        </YStack>
+      </Button>
+    </YStack>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Maps & Venues</Text>
-        <Text style={styles.headerSubtitle}>
-          Find your way to matches and training
-        </Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <YStack flex={1} backgroundColor="$background">
+      <YStack paddingHorizontal={20} paddingTop={32} paddingBottom={16} backgroundColor="$background" borderBottomWidth={1} borderBottomColor="$border">
+        <Text fontSize={26} fontWeight="800" color="$text">Maps & Venues</Text>
+        <Text fontSize={15} color="$secondary" marginTop={2}>Find your way to matches and training</Text>
+      </YStack>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {renderQuickActions()}
-        
-        <View style={styles.venuesContainer}>
-          <Text style={styles.sectionTitle}>Team Venues</Text>
+        <YStack padding={20} backgroundColor="$background" borderRadius={20}>
+          <Text fontSize={18} fontWeight="700" color="$text" marginBottom={16}>Team Venues</Text>
           {venues.map(renderVenueCard)}
-        </View>
+        </YStack>
       </ScrollView>
-    </SafeAreaView>
+    </YStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  content: {
-    flex: 1,
-  },
-  quickActionsContainer: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 16,
-  },
-  quickActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  quickActionInfo: {
-    marginLeft: 16,
-    flex: 1,
-  },
-  quickActionTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-    marginBottom: 2,
-  },
-  quickActionDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  venuesContainer: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-  },
-  venueCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  venueHeader: {
-    marginBottom: 12,
-  },
-  venueInfo: {
-    flex: 1,
-  },
-  venueName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  addressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  venueAddress: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginLeft: 6,
-    flex: 1,
-  },
-  nextEventContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  nextEventInfo: {
-    marginLeft: 8,
-    flex: 1,
-  },
-  nextEventTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1E40AF',
-    marginBottom: 2,
-  },
-  nextEventTime: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
-  venueActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  primaryButton: {
-    backgroundColor: '#3B82F6',
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-  secondaryButton: {
-    backgroundColor: '#F3F4F6',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  secondaryButtonText: {
-    color: '#3B82F6',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-});

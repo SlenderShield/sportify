@@ -5,7 +5,7 @@ import { YStack, Text, Spinner } from 'tamagui';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useAuth } from '@/hooks/useAuth';
 import { TamaguiProvider } from 'tamagui';
-import { tamaguiConfig } from '../tamagui/config';
+import tamaguiConfig from '../tamagui.config';
 
 function AuthGate() {
   const [isInitialized, setIsInitialized] = useState(false);
