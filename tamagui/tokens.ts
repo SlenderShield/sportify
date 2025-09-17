@@ -5,6 +5,13 @@ export const tokens = {
     background: '#F2F2F7',
     text: '#1C1C1E',
     border: '#D1D1D6',
+
+    // Dark mode equivalents
+    primaryDark: '#0A84FF',
+    secondaryDark: '#FF9F0A',
+    backgroundDark: '#1C1C1E',
+    textDark: '#F2F2F7',
+    borderDark: '#3A3A3C',
   },
   space: {
     0: 0,

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, YStack, XStack, Button, Theme, useMedia } from 'tamagui';
+import { Text, ScrollView, YStack, XStack, Button } from 'tamagui';
 import { RefreshControl } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
@@ -55,10 +55,8 @@ export default function DashboardScreen() {
 
   const upcomingEvents = getUpcomingEvents(7);
 
-  const media = useMedia();
   return (
-    <Theme name={media.md ? 'light' : 'dark'}>
-      <ScrollView
+    <ScrollView
         backgroundColor="$background"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={{ paddingBottom: 32 }}
@@ -71,7 +69,7 @@ export default function DashboardScreen() {
             paddingBottom={32}
             borderBottomLeftRadius={32}
             borderBottomRightRadius={32}
-            backgroundImage="linear-gradient(90deg, #3B82F6 0%, #10B981 100%)"
+            backgroundImage="linear-gradient(90deg, $primary 0%, $secondary 100%)"
             shadowColor="#3B82F6"
             shadowOffset={{ width: 0, height: 8 }}
             shadowOpacity={0.15}
@@ -133,7 +131,7 @@ export default function DashboardScreen() {
           </YStack>
         </YStack>
       </ScrollView>
-    </Theme>
+    
   );
 }
 

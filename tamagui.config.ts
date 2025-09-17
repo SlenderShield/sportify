@@ -2,6 +2,7 @@ import { createTamagui } from '@tamagui/core';
 import { config as baseConfig } from '@tamagui/config';
 import { tokens } from './tamagui/tokens';
 import { shorthands } from './tamagui/shorthands';
+import { themes } from './tamagui/theme';
 
 // Merge custom tokens, themes, and shorthands with the base config
 const tamaguiConfig = createTamagui({
@@ -12,6 +13,7 @@ const tamaguiConfig = createTamagui({
   },
   themes: {
     ...baseConfig.themes,
+    ...themes,
     // Optionally override or add custom themes here
   },
   shorthands: {

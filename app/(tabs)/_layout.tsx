@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Chrome as Home, MessageCircle, Bell, Map, Calendar, Settings } from 'lucide-react-native';
 import { useNotifications } from '@/hooks/useNotifications';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
   const { unreadCount } = useNotifications();
@@ -9,13 +10,30 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: '#0A84FF',
+        tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
+          position: 'absolute',
+          left: 16,
+          right: 16,
+          bottom: Platform.select({ ios: 24, android: 16 }),
+          height: 64,
           backgroundColor: '#FFFFFF',
-          borderTopColor: '#E5E7EB',
-          borderTopWidth: 1,
+          borderTopWidth: 0,
+          borderRadius: 24,
+          shadowColor: '#000',
+          shadowOpacity: 0.08,
+          shadowRadius: 18,
+          shadowOffset: { width: 0, height: 6 },
+          elevation: 12,
         },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          marginBottom: 6,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 6,
+        }
       }}>
       <Tabs.Screen
         name="index"

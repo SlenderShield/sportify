@@ -1,4 +1,5 @@
 import { YStack, XStack, Text, Input, Button, ScrollView, View } from 'tamagui';
+import { LinearGradient } from 'tamagui/linear-gradient';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,41 +19,85 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
-  
+
   const { registerWithEmail, isLoading, error, clearError } = useAuth();
 
   const handleRegister = async () => {
     clearError();
-    
-    // Validate inputs
     const errors = ValidationUtils.validateRegisterCredentials(credentials);
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
     }
-    
     setValidationErrors([]);
-    
     try {
       await registerWithEmail(credentials);
-      // Navigation is handled by the root layout
-    } catch (error) {
-      // Error is handled by the store
+    } catch (err) {
+      // Error handled in store
     }
   };
 
-  const getFieldError = (field: string) => {
-    return ValidationUtils.getErrorMessage(validationErrors, field);
-  };
+  const getFieldError = (field: string) => ValidationUtils.getErrorMessage(validationErrors, field);
 
   const updateCredential = (field: keyof RegisterCredentials, value: string) => {
     setCredentials(prev => ({ ...prev, [field]: value }));
-    
-    // Clear validation errors when user starts typing
     if (validationErrors.length > 0) {
-      setValidationErrors(prev => prev.filter(error => error.field !== field));
+      setValidationErrors(prev => prev.filter(e => e.field !== field));
     }
   };
+
+  const InputField = ({
+    label,
+    icon,
+    value,
+    placeholder,
+    secure = false,
+    showSecure = false,
+    toggleSecure,
+    field,
+    keyboardType = 'default'
+  }: any) => (
+    <YStack marginBottom={20}>
+      <Text fontSize={16} fontWeight="600" color="$text" marginBottom={6}>{label}</Text>
+      <XStack
+        alignItems="center"
+        borderWidth={1}
+        borderColor={getFieldError(field) ? "$red10" : "$border"}
+        borderRadius={12}
+        backgroundColor="$gray2"
+        paddingHorizontal={10}
+        height={48}
+        shadowColor="$gray8"
+        elevation={1}
+      >
+        {icon}
+        <Input
+          flex={1}
+          borderWidth={0}
+          backgroundColor="transparent"
+          placeholder={placeholder}
+          placeholderTextColor="#9CA3AF"
+          value={value}
+          secureTextEntry={secure && !showSecure}
+          onChangeText={(text) => updateCredential(field, text)}
+          keyboardType={keyboardType}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {secure && (
+          <Button
+            chromeless
+            onPress={toggleSecure}
+            padding={8}
+            icon={showSecure ? <EyeOff size={20} color="#6B7280" /> : <Eye size={20} color="#6B7280" />}
+          />
+        )}
+      </XStack>
+      {getFieldError(field) && (
+        <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError(field)}</Text>
+      )}
+    </YStack>
+  );
 
   return (
     <YStack flex={1} backgroundColor="$background">
@@ -62,11 +107,12 @@ export default function RegisterScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 20 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <YStack flex={1} paddingVertical={20}>
+          <YStack flex={1}>
+
             {/* Header */}
             <YStack alignItems="center" marginBottom={32}>
               <Button
@@ -91,157 +137,64 @@ export default function RegisterScreen() {
               </YStack>
             )}
 
-            {/* Registration Form */}
+            {/* Form Fields */}
             <YStack flex={1}>
-              {/* Name Field */}
-              <YStack marginBottom={20}>
-                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Full Name</Text>
-                <XStack
-                  alignItems="center"
-                  borderWidth={1}
-                  borderColor={getFieldError('name') ? "$red10" : "$border"}
-                  borderRadius={12}
-                  backgroundColor="$gray2"
-                  paddingHorizontal={8}
-                >
-                  <User size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
-                  <Input
-                    flex={1}
-                    borderWidth={0}
-                    backgroundColor="transparent"
-                    placeholder="Enter your full name"
-                    placeholderTextColor="#9CA3AF"
-                    value={credentials.name}
-                    onChangeText={(value) => updateCredential('name', value)}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                  />
-                </XStack>
-                {getFieldError('name') && (
-                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('name')}</Text>
-                )}
-              </YStack>
-
-              {/* Email Field */}
-              <YStack marginBottom={20}>
-                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Email Address</Text>
-                <XStack
-                  alignItems="center"
-                  borderWidth={1}
-                  borderColor={getFieldError('email') ? "$red10" : "$border"}
-                  borderRadius={12}
-                  backgroundColor="$gray2"
-                  paddingHorizontal={8}
-                >
-                  <Mail size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
-                  <Input
-                    flex={1}
-                    borderWidth={0}
-                    backgroundColor="transparent"
-                    placeholder="Enter your email"
-                    placeholderTextColor="#9CA3AF"
-                    value={credentials.email}
-                    onChangeText={(value) => updateCredential('email', value)}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </XStack>
-                {getFieldError('email') && (
-                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('email')}</Text>
-                )}
-              </YStack>
-
-              {/* Password Field */}
-              <YStack marginBottom={20}>
-                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Password</Text>
-                <XStack
-                  alignItems="center"
-                  borderWidth={1}
-                  borderColor={getFieldError('password') ? "$red10" : "$border"}
-                  borderRadius={12}
-                  backgroundColor="$gray2"
-                  paddingHorizontal={8}
-                >
-                  <Lock size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
-                  <Input
-                    flex={1}
-                    borderWidth={0}
-                    backgroundColor="transparent"
-                    placeholder="Create a strong password"
-                    placeholderTextColor="#9CA3AF"
-                    value={credentials.password}
-                    onChangeText={(value) => updateCredential('password', value)}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                  <Button
-                    chromeless
-                    onPress={() => setShowPassword(!showPassword)}
-                    padding={8}
-                    icon={showPassword ? <EyeOff size={20} color="#6B7280" /> : <Eye size={20} color="#6B7280" />}
-                  />
-                </XStack>
-                {getFieldError('password') && (
-                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('password')}</Text>
-                )}
-                <Text fontSize={12} color="$secondary" marginTop={4}>
-                  Password must be at least 8 characters with uppercase, lowercase, and number
-                </Text>
-              </YStack>
-
-              {/* Confirm Password Field */}
-              <YStack marginBottom={20}>
-                <Text fontSize={16} fontWeight="600" color="$text" marginBottom={8}>Confirm Password</Text>
-                <XStack
-                  alignItems="center"
-                  borderWidth={1}
-                  borderColor={getFieldError('confirmPassword') ? "$red10" : "$border"}
-                  borderRadius={12}
-                  backgroundColor="$gray2"
-                  paddingHorizontal={8}
-                >
-                  <Lock size={20} color="#6B7280" style={{ marginLeft: 8, marginRight: 8 }} />
-                  <Input
-                    flex={1}
-                    borderWidth={0}
-                    backgroundColor="transparent"
-                    placeholder="Confirm your password"
-                    placeholderTextColor="#9CA3AF"
-                    value={credentials.confirmPassword}
-                    onChangeText={(value) => updateCredential('confirmPassword', value)}
-                    secureTextEntry={!showConfirmPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                  <Button
-                    chromeless
-                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    padding={8}
-                    icon={showConfirmPassword ? <EyeOff size={20} color="#6B7280" /> : <Eye size={20} color="#6B7280" />}
-                  />
-                </XStack>
-                {getFieldError('confirmPassword') && (
-                  <Text color="$red10" fontSize={12} marginTop={4}>{getFieldError('confirmPassword')}</Text>
-                )}
-              </YStack>
+              <InputField
+                label="Full Name"
+                icon={<User size={20} color="#6B7280" style={{ marginRight: 8 }} />}
+                value={credentials.name}
+                placeholder="Enter your full name"
+                field="name"
+              />
+              <InputField
+                label="Email Address"
+                icon={<Mail size={20} color="#6B7280" style={{ marginRight: 8 }} />}
+                value={credentials.email}
+                placeholder="Enter your email"
+                field="email"
+                keyboardType="email-address"
+              />
+              <InputField
+                label="Password"
+                icon={<Lock size={20} color="#6B7280" style={{ marginRight: 8 }} />}
+                value={credentials.password}
+                placeholder="Create a strong password"
+                field="password"
+                secure
+                showSecure={showPassword}
+                toggleSecure={() => setShowPassword(!showPassword)}
+              />
+              <Text fontSize={12} color="$secondary" marginBottom={12}>
+                Password must be at least 8 characters with uppercase, lowercase, and number
+              </Text>
+              <InputField
+                label="Confirm Password"
+                icon={<Lock size={20} color="#6B7280" style={{ marginRight: 8 }} />}
+                value={credentials.confirmPassword}
+                placeholder="Confirm your password"
+                field="confirmPassword"
+                secure
+                showSecure={showConfirmPassword}
+                toggleSecure={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
 
               {/* Register Button */}
-              <Button
-                backgroundColor="$primary"
-                borderRadius={12}
-                paddingVertical={16}
-                alignItems="center"
-                marginTop={8}
-                disabled={isLoading}
-                opacity={isLoading ? 0.6 : 1}
-                onPress={handleRegister}
+              <LinearGradient
+                colors={isLoading ? ['$gray6', '$gray6'] : ['$primary', '$secondary']}
+                style={{ borderRadius: 12, overflow: 'hidden', marginTop: 8 }}
               >
-                <Text color="$background" fontSize={16} fontWeight="700">
-                  {isLoading ? 'Creating Account...' : 'Create Account'}
-                </Text>
-              </Button>
+                <Button
+                  unstyled
+                  paddingVertical={16}
+                  alignItems="center"
+                  onPress={handleRegister}
+                  disabled={isLoading}
+                >
+                  <Text color="$white" fontSize={16} fontWeight="700">
+                    {isLoading ? 'Creating Account...' : 'Create Account'}
+                  </Text>
+                </Button>
+              </LinearGradient>
             </YStack>
 
             {/* Terms */}
