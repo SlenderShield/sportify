@@ -1,18 +1,19 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: [
-      [
-        'babel-preset-expo',
-        {
-          unstable_transformImportMeta: true,
-        },
-      ],
-    ],
+    presets: ['babel-preset-expo'],
     plugins: [
-      ['@tamagui/babel-plugin', {
-        components: ['tamagui'],
-        config: './tamagui.config.ts',
+      'nativewind/babel',
+      ['module-resolver', {
+        root: ['./src'],
+        alias: {
+          '@api': './src/api',
+          '@components': './src/components',
+          '@features': './src/features',
+          '@hooks': './src/hooks',
+          '@theme': './src/theme',
+          '@utils': './src/utils',
+        },
       }],
     ],
   };
