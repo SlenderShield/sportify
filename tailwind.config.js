@@ -46,4 +46,5 @@ module.exports = {
     'dark:text-danger',
     'dark:text-muted',
   ],
+  presets: [require("nativewind/preset")],
 };

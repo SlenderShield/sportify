@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { GlobalStylesProvider } from './src/theme/NativeWindProvider';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
+import "./global.css"
 
 export default function App() {
   return (
